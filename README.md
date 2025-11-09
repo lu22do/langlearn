@@ -1,5 +1,11 @@
-1. Project created with vite-express, remove the src & public folders 
-2. Make sure the client can call the /hello api from server
-3. Added mongodb support
-4. Added pico.css, simplified CSS & client
-5. Added CRUD support
+# Overview
+
+Goal: be a smart language learning app
+
+# Reqs
+
+See Requirements.md
+
+# History
+
+1. imported from [boilerplate](https://github.com/lu22do/ludo-vite-express-boilerplate)
