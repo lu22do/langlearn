@@ -2,9 +2,14 @@ import "./css/index.css";
 
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import ItemCard from "./components/ItemCard";
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+// removed ItemCard import (moved to Home page)
 import ItemPage from "./pages/ItemPage";
+// new imports for pages
+import Home from "./pages/Home";
+import Snippets from "./pages/Snippets";
+import Learn from "./pages/Learn";
+import Settings from "./pages/Settings";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -119,95 +124,63 @@ function App() {
     }
   };
 
+  // Sidebar component (local)
+  const Sidebar: React.FC = () => {
+    const activeClass = ({ isActive }: { isActive: boolean }) =>
+      "nav-link" + (isActive ? " active" : "");
+    return (
+      <aside style={{ width: 220, padding: 16, borderRight: "1px solid #eee" }}>
+        <div style={{ fontWeight: 700, marginBottom: 12 }}>LangLearn</div>
+        <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <NavLink to="/" className={activeClass} end>
+            Home
+          </NavLink>
+          <NavLink to="/snippets" className={activeClass}>
+            Snippets
+          </NavLink>
+          <NavLink to="/learn" className={activeClass}>
+            Learn
+          </NavLink>
+          <NavLink to="/settings" className={activeClass}>
+            Settings
+          </NavLink>
+        </nav>
+      </aside>
+    );
+  };
+
+  // Layout: sidebar + content area
   return (
     <BrowserRouter>
-      <div className="App">
-        <div>
-          <a href="https://vitejs.dev" target="_blank">
-            <img src="/vite.svg" className="logo" alt="Vite logo" />
-          </a>
-          <a href="https://reactjs.org" target="_blank">
-            <img src="react.svg" className="logo react" alt="React logo" />
-          </a>
-        </div>
-
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <h1>Vite + React</h1>
-                <div className="card">
-                  <button onClick={() => setCount((count) => count + 1)}>
-                    count is {count}
-                  </button>
-
-                  {/* server API result */}
-                  <div style={{ marginTop: 16 }}>
-                    {loading && <p>Loading server message...</p>}
-                    {error && <p style={{ color: "red" }}>Error: {error}</p>}
-                    {!loading && !error && (
-                      <p>
-                        Server says: <strong>{serverMsg ?? "no message"}</strong>
-                      </p>
-                    )}
-                  </div>
-
-                  {/* new: add item form */}
-                  <div style={{ marginTop: 16 }}>
-                    <div>
-                      <label>
-                        Name:{" "}
-                        <input
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="Item name"
-                        />
-                      </label>
-                    </div>
-                    <div style={{ marginTop: 8 }}>
-                      <label>
-                        Quantity:{" "}
-                        <input
-                          type="number"
-                          value={quantity}
-                          onChange={(e) => setQuantity(e.target.value)}
-                          placeholder="0"
-                        />
-                      </label>
-                    </div>
-                    <div style={{ marginTop: 8 }}>
-                      <button onClick={() => writeDB()} disabled={loading || !name}>
-                        Add item
-                      </button>
-                      <button
-                        onClick={() => fetchItems()}
-                        style={{ marginLeft: 8 }}
-                        disabled={loading}
-                      >
-                        Load items
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* items list */}
-                  <div style={{ marginTop: 16 }}>
-                    {items.length === 0 ? (
-                      <p>No items loaded</p>
-                    ) : (
-                      <div>
-                        {items.map((it) => (
-                          <ItemCard key={it._id ?? `${it.name}-${it.quantity}`} item={it} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </>
-            }
-          />
-          <Route path="/items/:id" element={<ItemPage />} />
-        </Routes>
+      <div style={{ display: "flex", minHeight: "100vh" }}>
+        <Sidebar />
+        <main style={{ flex: 1, padding: 24 }}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Home
+                  count={count}
+                  onIncrement={() => setCount((c) => c + 1)}
+                  serverMsg={serverMsg}
+                  loading={loading}
+                  error={error}
+                  name={name}
+                  setName={setName}
+                  quantity={quantity}
+                  setQuantity={setQuantity}
+                  writeDB={writeDB}
+                  fetchItems={fetchItems}
+                  items={items}
+                />
+              }
+            />
+            <Route path="/snippets" element={<Snippets />} />
+            <Route path="/learn" element={<Learn />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/items/:id" element={<ItemPage />} />
+          </Routes>
+        </main>
       </div>
     </BrowserRouter>
   );
