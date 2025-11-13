@@ -2,7 +2,7 @@ import express from "express";
 import 'dotenv/config';
 import mongoose from "mongoose";
 import ViteExpress from "vite-express";
-import Item from "./models/Item.js";
+import Snippet from "./models/Snippet.js";
 
 const app = express();
 // parse JSON and URL-encoded bodies so req.body is populated
@@ -21,78 +21,104 @@ app.get("/hello", (_, res) => {
   res.send("Hello Vite + React + TypeScript!");
 });
 
-app.get("/api/items", async (_, res) => {
+// Snippet endpoints
+app.get("/api/snippets", async (req, res) => {
   try {
-    const items = await Item.find();
-    res.json(items);
+    const { languageCode, tag } = req.query;
+    const filter: any = {};
+    if (languageCode) filter.languageCode = languageCode;
+    if (tag) filter.tags = tag;
+    
+    const snippets = await Snippet.find(filter).sort({ createdAt: -1 });
+    res.json(snippets);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to fetch items" });
+    res.status(500).json({ error: "Failed to fetch snippets" });
   }
 });
 
-app.post('/api/items', async (req, res) => {
-  console.log("POST /api/items called with body:", req.body);
-  const newItem = new Item({
-    name: req.body.name,
-    quantity: req.body.quantity,
+app.post('/api/snippets', async (req, res) => {
+  console.log("POST /api/snippets called with body:", req.body);
+  
+  const { rawText, lemma, partOfSpeech, languageCode, sourceContext, tags } = req.body;
+  
+  if (!rawText || !sourceContext) {
+    return res.status(400).json({ message: "rawText and sourceContext are required" });
+  }
+  
+  if (sourceContext.length > 20000) {
+    return res.status(400).json({ message: "sourceContext exceeds 20,000 character limit" });
+  }
+
+  const newSnippet = new Snippet({
+    rawText,
+    lemma,
+    partOfSpeech,
+    languageCode: languageCode || "en",
+    sourceContext,
+    tags: tags || [],
   });
 
   try {
-    const savedItem = await newItem.save();
-    res.status(201).json(savedItem);
+    const savedSnippet = await newSnippet.save();
+    res.status(201).json(savedSnippet);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "Error creating item" });
+    res.status(400).json({ message: "Error creating snippet" });
   }
 });
 
-// DELETE item by id
-app.delete('/api/items/:id', async (req, res) => {
+// NEW: Get single snippet by id
+app.get('/api/snippets/:id', async (req, res) => {
   const id = req.params.id;
   try {
-    const deleted = await Item.findByIdAndDelete(id);
-    if (!deleted) {
-      return res.status(404).json({ message: "Item not found" });
+    const snippet = await Snippet.findById(id);
+    if (!snippet) {
+      return res.status(404).json({ message: "Snippet not found" });
     }
-    res.json({ message: "Item deleted", _id: deleted._id });
+    res.json(snippet);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "Error deleting item" });
+    res.status(400).json({ message: "Error fetching snippet" });
   }
 });
 
-// NEW: Get single item by id
-app.get('/api/items/:id', async (req, res) => {
+// NEW: Update snippet by id
+app.put('/api/snippets/:id', async (req, res) => {
   const id = req.params.id;
-  try {
-    const item = await Item.findById(id);
-    if (!item) {
-      return res.status(404).json({ message: "Item not found" });
-    }
-    res.json(item);
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ message: "Error fetching item" });
-  }
-});
-
-// NEW: Update item by id
-app.put('/api/items/:id', async (req, res) => {
-  const id = req.params.id;
+  const { rawText, lemma, partOfSpeech, languageCode, tags } = req.body;
   const update: any = {};
-  if (req.body.name !== undefined) update.name = req.body.name;
-  if (req.body.quantity !== undefined) update.quantity = req.body.quantity;
+  
+  if (rawText !== undefined) update.rawText = rawText;
+  if (lemma !== undefined) update.lemma = lemma;
+  if (partOfSpeech !== undefined) update.partOfSpeech = partOfSpeech;
+  if (languageCode !== undefined) update.languageCode = languageCode;
+  if (tags !== undefined) update.tags = tags;
 
   try {
-    const updated = await Item.findByIdAndUpdate(id, update, { new: true, runValidators: true });
+    const updated = await Snippet.findByIdAndUpdate(id, update, { new: true, runValidators: true });
     if (!updated) {
-      return res.status(404).json({ message: "Item not found" });
+      return res.status(404).json({ message: "Snippet not found" });
     }
     res.json(updated);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "Error updating item" });
+    res.status(400).json({ message: "Error updating snippet" });
+  }
+});
+
+// DELETE snippet by id
+app.delete('/api/snippets/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deleted = await Snippet.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Snippet not found" });
+    }
+    res.json({ message: "Snippet deleted", _id: deleted._id });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Error deleting snippet" });
   }
 });
 
