@@ -21,7 +21,6 @@ const snippetSchema = new Schema<ISnippet>(
     partOfSpeech: { type: String, maxlength: 50 },
     languageCode: { type: String, required: true, default: "en" },
     sourceContext: { type: String, required: true, maxlength: 20000 },
-    tags: { type: [String], default: [] },
     userId: { type: String },
     difficulty: { type: Number, min: 0, max: 1, default: 0.5 },
     nextReview: { type: Date },

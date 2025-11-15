@@ -158,7 +158,7 @@ export default function Home() {
             onClick={createSnippet}
             style={{ marginLeft: 12, padding: "6px 12px", fontSize: 13 }}
           >
-            Add as Snippet
+            Create Snippet
           </button>
         </div>
       )}
@@ -211,7 +211,6 @@ export default function Home() {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      Context: ...{snippet.sourceContext.substring(Math.max(0, snippet.startOffset - 30), snippet.endOffset + 30)}...
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
