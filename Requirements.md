@@ -7,10 +7,36 @@ Help learners turn any text they encounter into something they can get back to l
 ## Core concepts & glossary
 
 - **Prompt box**: a text input area where learners paste any string, a prompt, to mine snippets.
-- **Snippet**: a token or phrase (single word or multi‑word expression) selected from the prompt and saved (along with the orginal prompt).
-- **Learnies (Learning material)**: Set of learning material associated with a snippet: examples (in learning language), explanation and grammar rules (in learning language) and  translation (base language, default English unless changed).
+- **Snippet**: a token or phrase (single word or multi‑word expression) selected from the prompt and saved (along with the orginal prompt). A set of GenAI learning material is attached to snippet: examples (in learning language), explanation and grammar rules (in learning language) and  translation (base language, default English unless changed). A snippet has a state between "still learning" and "known" (archived). It also has a counter for how many times it has been seen by the user.
 - **Progressive disclosure**: help surfaces learning material in escalating order of “helpfulness” and dependency on the base language: examples → explanation → translation.
 - **Micro-lesson lane**: a scrollable stream where each item is treated as an individual micro‑lesson rather than part of a fixed deck for practicing snippets with quick interactions, hints, and short productions.
+
+## UX & UI requirements
+
+### Pages 
+
+- **Home page**: prompt box for snippet selection & creation.
+- **Snippets page**: manage snippets.
+- **Review page**: snippets displayed one by one, with progressive disclosure chips and response inputs (known / still learning).
+- **Quiz page**: GenAI quiz based on "still learning" snippets.
+- **Settings page**: manage settings.
+
+### Components
+
+- **Snippet detail component**: full context, morphology, tags, history, edit.
+
+### User journeys (v1)
+
+- Paste text → highlight → generate learning material → save as a snippet.
+- Manage all snippets.
+- Review page (Micro-lesson lane) with progressive disclosure (E/X/T) and typing response.
+- Basic adaptation: d‑score update + tiered intervals; due list.
+
+### User journeys (v2)
+
+- Snippets management: Search and grouping (collections).
+- Multiple users support, login/logout.
+- Settings for default translation language and hint policy.
 
 ## Functional requirements
 
@@ -19,8 +45,8 @@ Help learners turn any text they encounter into something they can get back to l
 - Paste or import text (min 1 char, max 20k chars per paste in MVP).
 - Tokenize text; allow user to select contiguous spans to form a snippet.
 - Actions on snippet: 
-  - generate learnies (one inference to generate all), progressively disclosed
-  - save (just the snippet or the snippet + learnies)
+  - generate learning material (one inference to generate all), progressively disclosed
+  - save (the snippet + learning material)
 - Store snippet with: raw text, lemma, Part of Speech, language code, source context, user tags, created_at.
 - Support multi‑word expressions and inflected forms; link variants to a canonical lemma when available.
 
@@ -63,16 +89,6 @@ Help learners turn any text they encounter into something they can get back to l
 - CEFR target per language.
 - Hint policy (allow/disable translation, limit number of hints per session).
 
-## UX & UI requirements
-
-- **Home**: prompt box + quick “Review now” CTA.
-- **Annotator**: paste area → tokenized text → drag‑select to create snippets → "Save".
-- **Review (Micro-lesson lane)**: list of tiles with progressive disclosure chips and response inputs.
-- **Snippet detail**: full context, morphology, tags, history, edit.
-- **Search/Collections** and **Settings**.
-- Keyboard‑first navigation; all actions reachable without a mouse.
-- Mobile first, but responsive up to desktop.
-
 ## Scheduling & scoring (adaptation engine)
 
 - **Per‑attempt inputs**: correctness (0/1/partial), response time, hints used (E/X/T), self‑assessment (Easy/Struggled/Unknown).
@@ -96,6 +112,7 @@ Help learners turn any text they encounter into something they can get back to l
 - id, user_id, lang, text, context_sentence, created_at
 - attributes{gender, case, tense, aspect, collocations[]}
 - difficulty_d, stability_s, last_reviewed_at, next_due_at
+- learning material (example, explanation, translation)
 
 **Attempt**
 
@@ -103,25 +120,26 @@ Help learners turn any text they encounter into something they can get back to l
 
 ## API (REST, illustrative)
 
+### Snippet CRUD APIs
+
 - `POST /snippets` {text, lang, context_sentence}
 - `GET /snippets?query=…&tag=…&due=true`
+- DELETE, PUT, GET all
+
+### Settings CRUD APIs
+
+- `PUT /users/{id}/prefs` {l1_default, cefr_targets, hint_policy}
+
+### TBD
+
 - `POST /review/next` {session_id} → returns ordered snippet IDs
 - `POST /attempts` {snippet_id, correctness, latency_ms, hints, self_assessment}
 - `POST /hints/examples` {snippet_id, cefr_target}
 - `POST /hints/explanation` {snippet_id, cefr_target}
 - `POST /hints/translation` {snippet_id, target_lang}
-- `PATCH /users/{id}/prefs` {l1_default, cefr_targets, hint_policy}
 
 ## Content quality rules
 
 - Examples must be natural, concise (≤20 words), and include the snippet.
 - Explanations must define usage, register, and typical collocations; avoid metalanguage for A1–A2.
 - Translations must be literal unless flagged as idiomatic; include note when idiomatic.
-
-## User journeys
-
-- Paste text → highlight → save snippets.
-- Micro-lesson lane with progressive disclosure (E/X/T) and typing response.
-- Basic adaptation: d‑score update + tiered intervals; due list.
-- Settings for default translation language and hint policy.
-- Search and simple collections.

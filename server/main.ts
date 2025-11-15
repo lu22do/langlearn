@@ -22,6 +22,7 @@ app.get("/hello", (_, res) => {
 });
 
 // Snippet endpoints
+// Get all snippets with optional filtering by languageCode and tag
 app.get("/api/snippets", async (req, res) => {
   try {
     const { languageCode, tag } = req.query;
@@ -37,6 +38,8 @@ app.get("/api/snippets", async (req, res) => {
   }
 });
 
+
+// Create new snippet
 app.post('/api/snippets', async (req, res) => {
   console.log("POST /api/snippets called with body:", req.body);
   
@@ -68,7 +71,7 @@ app.post('/api/snippets', async (req, res) => {
   }
 });
 
-// NEW: Get single snippet by id
+// Get single snippet by id
 app.get('/api/snippets/:id', async (req, res) => {
   const id = req.params.id;
   try {
@@ -83,7 +86,7 @@ app.get('/api/snippets/:id', async (req, res) => {
   }
 });
 
-// NEW: Update snippet by id
+// Update snippet by id
 app.put('/api/snippets/:id', async (req, res) => {
   const id = req.params.id;
   const { rawText, lemma, partOfSpeech, languageCode, tags } = req.body;
@@ -107,7 +110,7 @@ app.put('/api/snippets/:id', async (req, res) => {
   }
 });
 
-// DELETE snippet by id
+// Delete snippet by id
 app.delete('/api/snippets/:id', async (req, res) => {
   const id = req.params.id;
   try {
