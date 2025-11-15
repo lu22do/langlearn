@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import type { ISnippet } from "../../server/models/Snippet.js";
 
-type Snippet = Omit<ISnippet, keyof Document>; 
+type Snippet = Omit<ISnippet, keyof Document> & { _id?: string }; 
 
 interface PendingSnippet {
   rawText: string;
@@ -71,7 +71,7 @@ export default function Snippets() {
         {loading ? (
           <p>Loading snippets...</p>
         ) : savedSnippets.length === 0 ? (
-          <p style={{ color: "#6b7280" }}>No snippets saved yet. Create some above!</p>
+          <p style={{ color: "#6b7280" }}>No snippets saved yet. Create some!</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {savedSnippets.map((snippet) => (
