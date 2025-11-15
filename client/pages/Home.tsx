@@ -6,7 +6,7 @@ type Snippet = Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & { 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
-  const [snippets, setSnippets] = useState<Snippet[]>([]);
+  const [pendingSnippet, setPendingSnippet] = useState<Snippet | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export default function Home() {
       sourceContext: prompt,
     };
 
-    setSnippets([...snippets, newSnippet]);
+    setPendingSnippet(newSnippet);
     setSelection(null);
     setSuccess(`Added snippet: "${rawText}"`);
     setTimeout(() => setSuccess(null), 3000);
@@ -82,38 +82,12 @@ export default function Home() {
       setTimeout(() => setSuccess(null), 3000);
       
       // Remove from local list after saving
-      setSnippets(snippets.filter(s => s !== snippet));
+      setPendingSnippet(null);
     } catch (err: any) {
       setError(err?.message ?? "Failed to save snippet");
     } finally {
       setSaving(false);
     }
-  };
-
-  const saveAllSnippets = async () => {
-    setSaving(true);
-    setError(null);
-
-    try {
-      for (const snippet of snippets) {
-        await fetch("/api/snippets", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(snippet),
-        });
-      }
-      setSuccess(`Saved ${snippets.length} snippet(s) to database`);
-      setSnippets([]);
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err: any) {
-      setError(err?.message ?? "Failed to save snippets");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const removeSnippet = (index: number) => {
-    setSnippets(snippets.filter((_, i) => i !== index));
   };
 
   const selectedText = selection ? prompt.substring(selection.start, selection.end) : "";
@@ -175,62 +149,58 @@ export default function Home() {
         </div>
       )}
 
-      {snippets.length > 0 && (
+      {pendingSnippet && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <h2 style={{ margin: 0 }}>Pending Snippets ({snippets.length})</h2>
-            <button onClick={saveAllSnippets} disabled={saving} style={{ padding: "8px 16px" }}>
-              {saving ? "Saving..." : "Save All to Database"}
-            </button>
+            <h2 style={{ margin: 0 }}>Pending Snippet</h2>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {snippets.map((snippet, idx) => (
-              <div
-                key={idx}
-                style={{
-                  padding: 16,
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 8,
-                  background: "#fff",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
-                      {snippet.rawText}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: "#9ca3af",
-                        fontStyle: "italic",
-                        maxWidth: 600,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                    </div>
+            <div
+              key={pendingSnippet._id || "pending"}
+              style={{
+                padding: 16,
+                border: "1px solid #e5e7eb",
+                borderRadius: 8,
+                background: "#fff",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
+                    {pendingSnippet.rawText}
                   </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button
-                      onClick={() => saveSnippet(snippet)}
-                      disabled={saving}
-                      style={{ padding: "6px 12px", fontSize: 13 }}
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => removeSnippet(idx)}
-                      style={{ padding: "6px 12px", fontSize: 13, background: "#fee", border: "1px solid #fcc" }}
-                    >
-                      Remove
-                    </button>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "#9ca3af",
+                      fontStyle: "italic",
+                      maxWidth: 600,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                   </div>
                 </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button
+                    onClick={() => saveSnippet(pendingSnippet)}
+                    disabled={saving}
+                    style={{ padding: "6px 12px", fontSize: 13 }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setPendingSnippet(null)}
+                    style={{ padding: "6px 12px", fontSize: 13 }}
+                    className="secondary" 
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       )}
