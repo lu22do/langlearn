@@ -1,13 +1,16 @@
 import React, { useState, useRef } from "react";
-import type { ISnippet } from "../../server/models/Snippet.js";
+import type { SnippetAnalysis, ISnippet } from "../../server/models/Snippet.js";
 
 type Snippet = Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & { _id?: string }; 
+
+interface PendingSnippetWithAnalysis extends Snippet, SnippetAnalysis {}
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
-  const [pendingSnippet, setPendingSnippet] = useState<Snippet | null>(null);
+  const [pendingSnippet, setPendingSnippet] = useState<PendingSnippetWithAnalysis | null>(null);
   const [saving, setSaving] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -36,7 +39,7 @@ export default function Home() {
     }
   };
 
-  const createSnippet = () => {
+  const createSnippet = async () => {
     if (!selection || !prompt) {
       setError("Please select text first");
       return;
@@ -49,19 +52,49 @@ export default function Home() {
       return;
     }
 
-    const newSnippet: Snippet = {
-      rawText,
-      languageCode: "de",
-      sourceContext: prompt,
-    };
+    setAnalyzing(true);
+    setError(null);
 
-    setPendingSnippet(newSnippet);
-    setSelection(null);
-    setSuccess(`Added snippet: "${rawText}"`);
-    setTimeout(() => setSuccess(null), 3000);
+    try {
+      // Call the analyze API
+      const res = await fetch("/api/snippets/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: rawText,
+          context: prompt,
+          learning_language: "de",
+          base_language: "en"
+        }),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => null);
+        throw new Error(errBody?.error ?? `Server returned ${res.status}`);
+      }
+
+      const data = await res.json();
+      
+      const newSnippet: PendingSnippetWithAnalysis = {
+        rawText,
+        languageCode: "de",
+        sourceContext: prompt,
+        ...data.analysis
+      };
+
+      console.log("Analyzed snippet:", newSnippet);
+      setPendingSnippet(newSnippet);
+      setSelection(null);
+      setSuccess(`Analyzed snippet: "${rawText}"`);
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err: any) {
+      setError(err?.message ?? "Failed to analyze snippet");
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
-  const saveSnippet = async (snippet: Snippet) => {
+  const saveSnippet = async (snippet: PendingSnippetWithAnalysis) => {
     setSaving(true);
     setError(null);
 
@@ -130,9 +163,10 @@ export default function Home() {
           <strong>Selected:</strong> "{selectedText}"
           <button
             onClick={createSnippet}
+            disabled={analyzing}
             style={{ marginLeft: 12, padding: "6px 12px", fontSize: 13 }}
           >
-            Create Snippet
+            {analyzing ? "Analyzing..." : "Create Snippet"}
           </button>
         </div>
       )}
@@ -170,17 +204,62 @@ export default function Home() {
                   <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
                     {pendingSnippet.rawText}
                   </div>
+                  
+                  {/* Display AI analysis */}
+                  <div style={{ marginTop: 12, padding: 12, background: "#f9fafb", borderRadius: 6 }}>
+                    {pendingSnippet.examples && pendingSnippet.examples.length > 0 && (
+                      <div style={{ marginBottom: 12 }}>
+                        <strong style={{ fontSize: 13, color: "#374151" }}>Examples:</strong>
+                        <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13, listStyle: "none" }}>
+                          {pendingSnippet.examples.map((ex, idx) => (
+                            <li key={idx} style={{ marginBottom: 8 }}>
+                              <div style={{ color: "#1f2937", fontWeight: 500 }}>{ex.example}</div>
+                              <div style={{ color: "#6b7280", fontSize: 12, fontStyle: "italic" }}>{ex.translation}</div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {pendingSnippet.contextualExplanation && (
+                      <div style={{ marginBottom: 12 }}>
+                        <strong style={{ fontSize: 13, color: "#374151" }}>Contextual Explanation:</strong>
+                        <p style={{ margin: "4px 0", fontSize: 13 }}>{pendingSnippet.contextualExplanation}</p>
+                      </div>
+                    )}
+                    
+                    {pendingSnippet.explanations && pendingSnippet.explanations.length > 0 && (
+                      <div style={{ marginBottom: 12 }}>
+                        <strong style={{ fontSize: 13, color: "#374151" }}>Grammar & Usage:</strong>
+                        <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13 }}>
+                          {pendingSnippet.explanations.map((ex, idx) => (
+                            <li key={idx}>{ex}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {pendingSnippet.translation && (
+                      <div>
+                        <strong style={{ fontSize: 13, color: "#374151" }}>Translation:</strong>
+                        <p style={{ margin: "4px 0", fontSize: 13 }}>{pendingSnippet.translation}</p>
+                      </div>
+                    )}
+                  </div>
+                  
                   <div
                     style={{
                       fontSize: 12,
                       color: "#9ca3af",
                       fontStyle: "italic",
+                      marginTop: 8,
                       maxWidth: 600,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
                     }}
                   >
+                    Context: {pendingSnippet.sourceContext.substring(0, 100)}...
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
@@ -189,12 +268,11 @@ export default function Home() {
                     disabled={saving}
                     style={{ padding: "6px 12px", fontSize: 13 }}
                   >
-                    Save
+                    {saving ? "Saving..." : "Save"}
                   </button>
                   <button
                     onClick={() => setPendingSnippet(null)}
-                    style={{ padding: "6px 12px", fontSize: 13 }}
-                    className="secondary" 
+                    style={{ padding: "6px 12px", fontSize: 13, background: "#f3f4f6", border: "1px solid #d1d5db" }}
                   >
                     Cancel
                   </button>

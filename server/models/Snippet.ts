@@ -1,6 +1,18 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface ISnippet extends Document {
+export interface ExampleWithTranslation {
+  example: string;
+  translation: string;
+}
+
+export interface SnippetAnalysis {
+  contextualExplanation?: string;
+  examples?: ExampleWithTranslation[];
+  explanations?: string[];
+  translation?: string;
+}
+
+export interface ISnippet extends Document, SnippetAnalysis {
   rawText: string;
   lemma?: string;
   partOfSpeech?: string;
@@ -25,6 +37,16 @@ const snippetSchema = new Schema<ISnippet>(
     difficulty: { type: Number, min: 0, max: 1, default: 0.5 },
     nextReview: { type: Date },
     reviewCount: { type: Number, default: 0 },
+    contextualExplanation: { type: String },
+    examples: { 
+      type: [{
+        example: { type: String, required: true },
+        translation: { type: String, required: true }
+      }],
+      default: []
+    },
+    explanations: { type: [String] },
+    translation: { type: String },
   },
   { timestamps: true }
 );

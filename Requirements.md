@@ -118,6 +118,10 @@ Help learners turn any text they encounter into something they can get back to l
 
 - id, snippet_id, user_id, timestamp, correctness, latency_ms, hints{example\:boolean, explanation\:boolean, translation\:boolean}, self_assessment{easy|struggled|unknown}
 
+**Settings**
+
+- base_lang, ui_lang, learning_lang 
+
 ## API (REST, illustrative)
 
 ### Snippet CRUD APIs

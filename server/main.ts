@@ -3,6 +3,7 @@ import 'dotenv/config';
 import mongoose from "mongoose";
 import ViteExpress from "vite-express";
 import Snippet from "./models/Snippet.js";
+import { analyzeSnippet, generateFlashcards, generateQuiz } from "./ai.js";
 
 const app = express();
 // parse JSON and URL-encoded bodies so req.body is populated
@@ -16,10 +17,6 @@ console.log("Using MongoDB URI:", MONGODB_URI);
 mongoose.connect(MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
-
-app.get("/hello", (_, res) => {
-  res.send("Hello Vite + React + TypeScript!");
-});
 
 // Snippet endpoints
 // Get all snippets with optional filtering by languageCode and tag
@@ -38,8 +35,25 @@ app.get("/api/snippets", async (req, res) => {
   }
 });
 
+app.post("/api/snippets/analyze", async (req, res) => {
+  try {
+    const { text, context, learning_language, base_language } = req.body;
+    
+    if (!text || !context || !learning_language) {
+      return res.status(400).json({ error: "Text and learning language are required" });
+    }
 
-// Create new snippet
+    // Get AI analysis
+    const analysis = await analyzeSnippet(text, context, learning_language, base_language);
+
+    res.json({ text, analysis });
+  } catch (error: any) {
+    console.error("Error analyzing snippet:", error);
+    res.status(500).json({ error: error.message || "Failed to analyze snippet" });
+  }
+});
+
+// Store new snippet
 app.post('/api/snippets', async (req, res) => {
   console.log("POST /api/snippets called with body:", req.body);
   
