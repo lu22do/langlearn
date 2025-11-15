@@ -7,7 +7,6 @@ interface PendingSnippet {
   rawText: string;
   languageCode: string;
   sourceContext: string;
-  tags: string[];
   startOffset: number;
   endOffset: number;
 }
@@ -94,11 +93,6 @@ export default function Snippets() {
                       {snippet.lemma && <span style={{ marginLeft: 12 }}>Lemma: {snippet.lemma}</span>}
                       {snippet.partOfSpeech && <span style={{ marginLeft: 12 }}>POS: {snippet.partOfSpeech}</span>}
                     </div>
-                    {snippet.tags && snippet.tags.length > 0 && (
-                      <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 4 }}>
-                        Tags: {snippet.tags.join(", ")}
-                      </div>
-                    )}
                     <div
                       style={{
                         fontSize: 12,

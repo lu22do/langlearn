@@ -6,7 +6,6 @@ export interface ISnippet extends Document {
   partOfSpeech?: string;
   languageCode: string;
   sourceContext: string;
-  tags: string[];
   createdAt: Date;
   updatedAt: Date;
   userId?: string;

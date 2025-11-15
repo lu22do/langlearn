@@ -1,14 +1,12 @@
 import React, { useState, useRef } from "react";
 import type { ISnippet } from "../../server/models/Snippet.js";
 
-type Snippet = Omit<ISnippet, keyof Document>; 
+type Snippet = Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & { _id?: string }; 
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
   const [snippets, setSnippets] = useState<Snippet[]>([]);
-  const [languageCode, setLanguageCode] = useState("en");
-  const [tags, setTags] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -53,11 +51,8 @@ export default function Home() {
 
     const newSnippet: Snippet = {
       rawText,
-      languageCode,
+      languageCode: "de",
       sourceContext: prompt,
-      tags: tags.split(",").map(t => t.trim()).filter(Boolean),
-      startOffset: selection.start,
-      endOffset: selection.end,
     };
 
     setSnippets([...snippets, newSnippet]);
@@ -66,7 +61,7 @@ export default function Home() {
     setTimeout(() => setSuccess(null), 3000);
   };
 
-  const saveSnippet = async (snippet: SnippetData) => {
+  const saveSnippet = async (snippet: Snippet) => {
     setSaving(true);
     setError(null);
 
@@ -131,38 +126,6 @@ export default function Home() {
       </p>
 
       <div style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-          <label>
-            Language:
-            <select
-              value={languageCode}
-              onChange={(e) => setLanguageCode(e.target.value)}
-              style={{ marginLeft: 8, padding: "4px 8px" }}
-            >
-              <option value="en">English</option>
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="it">Italian</option>
-              <option value="pt">Portuguese</option>
-              <option value="ru">Russian</option>
-              <option value="zh">Chinese</option>
-              <option value="ja">Japanese</option>
-              <option value="ko">Korean</option>
-            </select>
-          </label>
-          <label style={{ flex: 1 }}>
-            Tags (comma-separated):
-            <input
-              type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="grammar, vocabulary, idiom"
-              style={{ marginLeft: 8, padding: "4px 8px", width: "100%" }}
-            />
-          </label>
-        </div>
-
         <textarea
           ref={textAreaRef}
           value={prompt}
@@ -236,14 +199,6 @@ export default function Home() {
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
                       {snippet.rawText}
-                    </div>
-                    <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>
-                      Language: {snippet.languageCode}
-                      {snippet.tags.length > 0 && (
-                        <span style={{ marginLeft: 8 }}>
-                          Tags: {snippet.tags.join(", ")}
-                        </span>
-                      )}
                     </div>
                     <div
                       style={{
