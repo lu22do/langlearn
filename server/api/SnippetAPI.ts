@@ -42,7 +42,22 @@ export function registerSnippetRoutes(app: Express) {
   app.post('/api/snippets', async (req, res) => {
     console.log("POST /api/snippets called with body:", req.body);
     
-    const { rawText, lemma, partOfSpeech, languageCode, sourceContext, tags } = req.body;
+    const { 
+      rawText, 
+      lemma, 
+      partOfSpeech, 
+      languageCode, 
+      sourceContext, 
+      tags,
+      contextualExplanation,
+      examples,
+      explanations,
+      translation,
+      userId,
+      difficulty,
+      nextReview,
+      reviewCount
+    } = req.body;
     
     if (!rawText || !sourceContext) {
       return res.status(400).json({ message: "rawText and sourceContext are required" });
@@ -59,6 +74,14 @@ export function registerSnippetRoutes(app: Express) {
       languageCode: languageCode || "en",
       sourceContext,
       tags: tags || [],
+      contextualExplanation,
+      examples,
+      explanations,
+      translation,
+      userId,
+      difficulty,
+      nextReview,
+      reviewCount
     });
 
     try {
@@ -88,7 +111,20 @@ export function registerSnippetRoutes(app: Express) {
   // Update snippet by id
   app.put('/api/snippets/:id', async (req, res) => {
     const id = req.params.id;
-    const { rawText, lemma, partOfSpeech, languageCode, tags } = req.body;
+    const { 
+      rawText, 
+      lemma, 
+      partOfSpeech, 
+      languageCode, 
+      tags,
+      contextualExplanation,
+      examples,
+      explanations,
+      translation,
+      difficulty,
+      nextReview,
+      reviewCount
+    } = req.body;
     const update: any = {};
     
     if (rawText !== undefined) update.rawText = rawText;
@@ -96,6 +132,13 @@ export function registerSnippetRoutes(app: Express) {
     if (partOfSpeech !== undefined) update.partOfSpeech = partOfSpeech;
     if (languageCode !== undefined) update.languageCode = languageCode;
     if (tags !== undefined) update.tags = tags;
+    if (contextualExplanation !== undefined) update.contextualExplanation = contextualExplanation;
+    if (examples !== undefined) update.examples = examples;
+    if (explanations !== undefined) update.explanations = explanations;
+    if (translation !== undefined) update.translation = translation;
+    if (difficulty !== undefined) update.difficulty = difficulty;
+    if (nextReview !== undefined) update.nextReview = nextReview;
+    if (reviewCount !== undefined) update.reviewCount = reviewCount;
 
     try {
       const updated = await Snippet.findByIdAndUpdate(id, update, { new: true, runValidators: true });

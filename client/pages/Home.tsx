@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import type { SnippetAnalysis, ISnippet } from "../../server/models/Snippet.js";
 import { useSettings } from "../contexts/SettingsContext";
+import SnippetCard from "../components/SnippetCard";
 
 type Snippet = Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & { _id?: string }; 
 
@@ -14,8 +15,6 @@ export default function Home() {
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [hoveredExample, setHoveredExample] = useState<number | null>(null);
-  const [hoveredTranslation, setHoveredTranslation] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { settings } = useSettings();
 
@@ -101,7 +100,7 @@ export default function Home() {
   const saveSnippet = async (snippet: PendingSnippetWithAnalysis) => {
     setSaving(true);
     setError(null);
-
+console.log("Saving snippet:", snippet);
     try {
       const res = await fetch("/api/snippets", {
         method: "POST",
@@ -195,141 +194,48 @@ export default function Home() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div
-              key={pendingSnippet._id || "pending"}
               style={{
                 padding: 16,
-                border: "1px solid #e5e7eb",
+                border: "2px solid #3b82f6",
                 borderRadius: 8,
-                background: "#fff",
+                background: "#eff6ff",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
-                    {pendingSnippet.rawText}
-                  </div>
-                  
-                  {/* Display AI analysis */}
-                  <div style={{ marginTop: 12, padding: 12, background: "#f9fafb", borderRadius: 6 }}>
-                    {pendingSnippet.examples && pendingSnippet.examples.length > 0 && (
-                      <div style={{ marginBottom: 12 }}>
-                        <strong style={{ fontSize: 13, color: "#374151" }}>Examples:</strong>
-                        <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13, listStyle: "none" }}>
-                          {pendingSnippet.examples.map((ex, idx) => (
-                            <li 
-                              key={idx} 
-                              style={{ 
-                                marginBottom: 8,
-                                cursor: "pointer",
-                                padding: "6px 8px",
-                                borderRadius: 4,
-                                position: "relative"
-                              }}
-                              onMouseEnter={() => setHoveredExample(idx)}
-                              onMouseLeave={() => setHoveredExample(null)}
-                            >
-                              <div style={{ color: "#1f2937", fontWeight: 500 }}>{ex.example}</div>
-                              {hoveredExample === idx && (
-                                <div style={{ 
-                                  position: "absolute",
-                                  bottom: "50%",
-                                  left: "25%",
-                                  transform: "translateX(-50%)",
-                                  marginBottom: 8,
-                                  padding: "8px 12px",
-                                  background: "#1f2937",
-                                  color: "#fff",
-                                  fontSize: 12,
-                                  borderRadius: 6,
-                                  whiteSpace: "nowrap",
-                                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                                  zIndex: 10,
-                                  maxWidth: "400px",
-                                }}>
-                                  {ex.translation}
-                                </div>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {pendingSnippet.contextualExplanation && (
-                      <div style={{ marginBottom: 12 }}>
-                        <strong style={{ fontSize: 13, color: "#374151" }}>Contextual Explanation:</strong>
-                        <p style={{ margin: "4px 0", fontSize: 13 }}>{pendingSnippet.contextualExplanation}</p>
-                      </div>
-                    )}
-                    
-                    {pendingSnippet.explanations && pendingSnippet.explanations.length > 0 && (
-                      <div style={{ marginBottom: 12 }}>
-                        <strong style={{ fontSize: 13, color: "#374151" }}>Grammar & Usage:</strong>
-                        <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13 }}>
-                          {pendingSnippet.explanations.map((ex, idx) => (
-                            <li key={idx}>{ex}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {pendingSnippet.translation && (
-                      <div>
-                        <strong style={{ fontSize: 13, color: "#374151" }}>Translation:</strong>
-                        <div 
-                          style={{ 
-                            margin: "4px 0", 
-                            fontSize: 13,
-                            cursor: "pointer",
-                            padding: "6px 8px",
-                            borderRadius: 4,
-                            background: hoveredTranslation ? "#f0f9ff" : "transparent",
-                            transition: "background 0.2s",
-                            display: "inline-block"
-                          }}
-                          onMouseEnter={() => setHoveredTranslation(true)}
-                          onMouseLeave={() => setHoveredTranslation(false)}
-                        >
-                          {hoveredTranslation ? (
-                            <span>{pendingSnippet.translation}</span>
-                          ) : (
-                            <span style={{ color: "#9ca3af" }}>Hover to reveal</span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: "#9ca3af",
-                      fontStyle: "italic",
-                      marginTop: 8,
-                      maxWidth: 600,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Context: {pendingSnippet.sourceContext.substring(0, 100)}...
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button
-                    onClick={() => saveSnippet(pendingSnippet)}
-                    disabled={saving}
-                    style={{ padding: "6px 12px", fontSize: 13 }}
-                  >
-                    {saving ? "Saving..." : "Save"}
-                  </button>
-                  <button
-                    onClick={() => setPendingSnippet(null)}
-                    style={{ padding: "6px 12px", fontSize: 13, background: "#f3f4f6", border: "1px solid #d1d5db" }}
-                  >
-                    Cancel
-                  </button>
-                </div>
+              <SnippetCard snippet={pendingSnippet} saving={saving} showTooltips={true} />
+              
+              <div style={{ display: "flex", gap: 8, marginTop: 16, paddingTop: 16, borderTop: "1px solid #bfdbfe" }}>
+                <button
+                  onClick={() => saveSnippet(pendingSnippet)}
+                  disabled={saving}
+                  style={{ 
+                    padding: "8px 16px", 
+                    fontSize: 14,
+                    fontWeight: 600,
+                    background: "#2563eb",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 6,
+                    cursor: saving ? "not-allowed" : "pointer",
+                    opacity: saving ? 0.6 : 1
+                  }}
+                >
+                  {saving ? "Saving..." : "Save Snippet"}
+                </button>
+                <button
+                  onClick={() => setPendingSnippet(null)}
+                  style={{ 
+                    padding: "8px 16px", 
+                    fontSize: 14,
+                    fontWeight: 600,
+                    background: "#f3f4f6", 
+                    color: "#374151",
+                    border: "1px solid #d1d5db",
+                    borderRadius: 6,
+                    cursor: "pointer"
+                  }}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
