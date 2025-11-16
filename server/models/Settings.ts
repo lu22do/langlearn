@@ -1,10 +1,11 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { LANGUAGES, type LanguageCode } from "../../shared/constants/languages";
 
 export interface ISettings extends Document {
   userId?: string;
-  baseLanguageCode: string; // Language for translations (e.g., "en")
-  UILanguageCode: string; // Language for the UI (e.g., "en")
-  learningLanguageCode: string; // Language being learned (e.g., "de")
+  baseLanguageCode: LanguageCode;
+  UILanguageCode: LanguageCode;
+  learningLanguageCode: LanguageCode;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -12,14 +13,28 @@ export interface ISettings extends Document {
 const settingsSchema = new Schema<ISettings>(
   {
     userId: { type: String, unique: true, sparse: true },
-    baseLanguageCode: { type: String, required: true, default: "en" },
-    UILanguageCode: { type: String, required: true, default: "en" },
-    learningLanguageCode: { type: String, required: true, default: "de" },
+    baseLanguageCode: { 
+      type: String, 
+      required: true, 
+      default: "en",
+      enum: LANGUAGES.map(l => l.code)
+    },
+    UILanguageCode: { 
+      type: String, 
+      required: true, 
+      default: "en",
+      enum: LANGUAGES.map(l => l.code)
+    },
+    learningLanguageCode: { 
+      type: String, 
+      required: true, 
+      default: "de",
+      enum: LANGUAGES.map(l => l.code)
+    },
   },
   { timestamps: true }
 );
 
-// Ensure we only have one settings document per user (or one global if no userId)
 settingsSchema.index({ userId: 1 }, { unique: true, sparse: true });
 
 export default mongoose.model<ISettings>("Settings", settingsSchema);

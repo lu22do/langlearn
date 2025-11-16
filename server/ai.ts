@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { LANGUAGES, getLanguageName } from "../shared/constants/languages.js";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,8 +17,8 @@ export async function analyzeSnippet(
   learningLanguageCode: string,
   baseLanguageCode: string
 ): Promise<AnalysisResult> {
-  const learning_language = convertLanguageCodeToLanguage(learningLanguageCode);
-  const base_language = convertLanguageCodeToLanguage(baseLanguageCode);
+  const learning_language = getLanguageName(learningLanguageCode) || learningLanguageCode;
+  const base_language = getLanguageName(baseLanguageCode) || baseLanguageCode;
 
   const prompt = `You are a language learning assistant. Analyze the following ${learning_language} text and provide a comprehensive learning breakdown.
 
@@ -191,31 +192,3 @@ correctAnswer should be the index (0-3) of the correct option.`;
 
   return JSON.parse(content);
 }
-
-function convertLanguageCodeToLanguage(languageCode: string): string {
-  const languageMap: Record<string, string> = {
-    'en': 'English',
-    'es': 'Spanish',
-    'fr': 'French',
-    'de': 'German',
-    'it': 'Italian',
-    'pt': 'Portuguese',
-    'ru': 'Russian',
-    'ja': 'Japanese',
-    'ko': 'Korean',
-    'zh': 'Chinese',
-    'ar': 'Arabic',
-    'hi': 'Hindi',
-    'nl': 'Dutch',
-    'sv': 'Swedish',
-    'pl': 'Polish',
-    'tr': 'Turkish',
-    'vi': 'Vietnamese',
-    'th': 'Thai',
-    'id': 'Indonesian',
-    'he': 'Hebrew',
-  };
-
-  return languageMap[languageCode] || languageCode;
-}
-
