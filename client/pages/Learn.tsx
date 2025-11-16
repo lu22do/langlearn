@@ -1,10 +1,18 @@
 import React from "react";
+import { useLocalization } from "../contexts/LocalizationContext";
 
 export default function Learn() {
+  const { t } = useLocalization();
+  
   return (
     <section>
-      <h1>Learn</h1>
-      <p>Micro-lesson lane with progressive disclosure (Examples / Explanation / Translation).</p>
+      <h1>{t.learn.title}</h1>
+      <p style={{ color: "#6b7280", marginBottom: 24 }}>
+        {t.learn.subtitle}
+      </p>
+      <p style={{ fontStyle: "italic", color: "#9ca3af" }}>
+        {t.learn.comingSoon}
+      </p>
     </section>
   );
 }

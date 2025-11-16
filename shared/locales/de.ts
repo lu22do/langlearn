@@ -1,0 +1,108 @@
+import type { TranslationKeys } from "./en";
+
+export const de: TranslationKeys = {
+  nav: {
+    home: "Startseite",
+    snippets: "Schnipsel",
+    learn: "Lernen",
+    quiz: "Quiz",
+    settings: "Einstellungen",
+  },
+  
+  common: {
+    loading: "Lädt...",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    delete: "Löschen",
+    refresh: "Aktualisieren",
+    back: "Zurück",
+    close: "Schließen",
+    confirm: "Bestätigen",
+    error: "Fehler",
+    success: "Erfolg",
+    saving: "Speichert...",
+    deleting: "Löscht...",
+    created: "Erstellt",
+  },
+  
+  home: {
+    title: "Schnipsel hinzufügen",
+    subtitle: "Fügen Sie unten Text ein und wählen Sie Wörter oder Phrasen aus, um Schnipsel zum Lernen zu erstellen.",
+    placeholder: "Fügen Sie Ihren Text hier ein (max. 20.000 Zeichen)...",
+    characters: "Zeichen",
+    selected: "Ausgewählt",
+    createSnippet: "Schnipsel erstellen",
+    analyzing: "Analysiere...",
+    pendingSnippet: "Ausstehender Schnipsel",
+    saveSnippet: "Schnipsel speichern",
+    snippetAnalyzed: "Schnipsel analysiert",
+    snippetSaved: "Schnipsel in Datenbank gespeichert",
+    selectTextFirst: "Bitte wählen Sie zuerst Text aus",
+    selectedTextEmpty: "Ausgewählter Text ist leer",
+    failedToAnalyze: "Analyse des Schnipsels fehlgeschlagen",
+    failedToSave: "Speichern des Schnipsels fehlgeschlagen",
+  },
+  
+  snippetList: {
+    title: "Schnipsel",
+    subtitle: "Durchsuchen und verwalten Sie Ihre gespeicherten Sprachschnipsel. Klicken Sie auf eine Karte, um Details anzuzeigen.",
+    savedSnippets: "Gespeicherte Schnipsel",
+    noSnippets: "Noch keine Schnipsel gespeichert. Erstellen Sie welche!",
+    snippetDeleted: "Schnipsel gelöscht",
+    failedToLoad: "Laden der Schnipsel fehlgeschlagen",
+    failedToDelete: "Löschen des Schnipsels fehlgeschlagen",
+  },
+  
+  snippet: {
+    title: "Schnipsel-Details",
+    backToSnippets: "Zurück zu Schnipseln",
+    confirmDelete: "Sind Sie sicher, dass Sie diesen Schnipsel löschen möchten?",
+    notFound: "Schnipsel nicht gefunden",
+    failedToLoad: "Laden des Schnipsels fehlgeschlagen",
+    failedToDelete: "Löschen des Schnipsels fehlgeschlagen",
+  },
+  
+  snippetCard: {
+    language: "Sprache",
+    lemma: "Lemma",
+    pos: "Wortart",
+    examples: "Beispiele",
+    contextualExplanation: "Kontextuelle Erklärung",
+    grammarUsage: "Grammatik & Verwendung",
+    translation: "Übersetzung",
+    hoverToReveal: "Bewegen Sie die Maus, um aufzudecken",
+    context: "Kontext",
+  },
+  
+  settings: {
+    title: "Einstellungen",
+    subtitle: "Konfigurieren Sie Ihre Sprachpräferenzen und Lerneinstellungen.",
+    learningLanguage: "Lernsprache",
+    learningLanguageDesc: "Die Sprache, die Sie lernen möchten",
+    baseLanguage: "Basissprache",
+    baseLanguageDesc: "Ihre Muttersprache (für Übersetzungen verwendet)",
+    uiLanguage: "UI-Sprache",
+    uiLanguageDesc: "Sprache für die App-Oberfläche",
+    saveSettings: "Einstellungen speichern",
+    reset: "Zurücksetzen",
+    currentSettings: "Aktuelle Einstellungen",
+    learning: "Lernen",
+    base: "Basis",
+    ui: "UI",
+    settingsSaved: "Einstellungen erfolgreich gespeichert!",
+    failedToLoad: "Laden der Einstellungen fehlgeschlagen",
+    failedToSave: "Speichern der Einstellungen fehlgeschlagen",
+  },
+  
+  learn: {
+    title: "Lernen",
+    subtitle: "Überprüfen Sie Ihre gespeicherten Schnipsel und üben Sie.",
+    comingSoon: "Kommt bald...",
+  },
+  
+  quiz: {
+    title: "Quiz",
+    subtitle: "Testen Sie Ihr Wissen mit interaktiven Quiz.",
+    comingSoon: "Kommt bald...",
+  },
+};

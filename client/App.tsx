@@ -4,6 +4,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import { SettingsProvider } from "./contexts/SettingsContext";
+import { LocalizationProvider } from "./contexts/LocalizationContext";
+import { useLocalization } from "./contexts/LocalizationContext";
 import Home from "./pages/Home";
 import SnippetList from "./pages/SnippetList";
 import Snippet from "./pages/Snippet";
@@ -11,7 +13,9 @@ import Learn from "./pages/Learn";
 import Quiz from "./pages/Quiz";
 import Settings from "./pages/Settings";
 
-function App() {
+function AppContent() {
+  const { t } = useLocalization();
+  
   // Sidebar component (local)
   const Sidebar: React.FC = () => {
     const activeClass = ({ isActive }: { isActive: boolean }) =>
@@ -21,19 +25,19 @@ function App() {
         <div style={{ fontWeight: 700, marginBottom: 12 }}>LangLearn</div>
         <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <NavLink to="/" className={activeClass} end>
-            Home
+            {t.nav.home}
           </NavLink>
           <NavLink to="/snippets" className={activeClass}>
-            Snippets
+            {t.nav.snippets}
           </NavLink>
           <NavLink to="/learn" className={activeClass}>
-            Learn
+            {t.nav.learn}
           </NavLink>
           <NavLink to="/quiz" className={activeClass}>
-            Quiz
+            {t.nav.quiz}
           </NavLink>
           <NavLink to="/settings" className={activeClass}>
-            Settings
+            {t.nav.settings}
           </NavLink>
         </nav>
       </aside>
@@ -60,14 +64,22 @@ function App() {
   );
 }
 
+function App() {
+  return (
+    <SettingsProvider>
+      <LocalizationProvider>
+        <AppContent />
+      </LocalizationProvider>
+    </SettingsProvider>
+  );
+}
+
 export default App;
 
 // render merged entry (replaces client/main.tsx)
 const rootEl = document.getElementById("root") as HTMLElement;
 ReactDOM.createRoot(rootEl).render(
   <React.StrictMode>
-    <SettingsProvider>
-      <App />
-    </SettingsProvider>
+    <App />
   </React.StrictMode>,
 );

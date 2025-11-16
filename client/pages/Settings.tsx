@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { LANGUAGES } from "../../shared/constants/languages";
+import { useLocalization } from "../contexts/LocalizationContext";
 
 interface SettingsData {
   _id?: string;
@@ -9,6 +10,7 @@ interface SettingsData {
 }
 
 export default function Settings() {
+  const { t } = useLocalization();
   const [settings, setSettings] = useState<SettingsData>({
     baseLanguageCode: "en",
     UILanguageCode: "en",
@@ -32,7 +34,7 @@ export default function Settings() {
       const data = await res.json();
       setSettings(data);
     } catch (err: any) {
-      setError(err?.message ?? "Failed to load settings");
+      setError(err?.message ?? t.settings.failedToLoad);
     } finally {
       setLoading(false);
     }
@@ -57,10 +59,13 @@ export default function Settings() {
 
       const updated = await res.json();
       setSettings(updated);
-      setSuccess("Settings saved successfully!");
+      setSuccess(t.settings.settingsSaved);
       setTimeout(() => setSuccess(null), 3000);
+      
+      // Reload page to apply new UI language
+      window.location.reload();
     } catch (err: any) {
-      setError(err?.message ?? "Failed to save settings");
+      setError(err?.message ?? t.settings.failedToSave);
     } finally {
       setSaving(false);
     }
@@ -73,17 +78,17 @@ export default function Settings() {
   if (loading) {
     return (
       <section>
-        <h1>Settings</h1>
-        <p>Loading settings...</p>
+        <h1>{t.settings.title}</h1>
+        <p>{t.common.loading}</p>
       </section>
     );
   }
 
   return (
     <section>
-      <h1>Settings</h1>
+      <h1>{t.settings.title}</h1>
       <p style={{ color: "#6b7280", marginBottom: 24 }}>
-        Configure your language preferences and learning settings.
+        {t.settings.subtitle}
       </p>
 
       {error && (
@@ -101,10 +106,10 @@ export default function Settings() {
       <div style={{ maxWidth: 600, background: "#fff", padding: 24, borderRadius: 8, border: "1px solid #e5e7eb" }}>
         <div style={{ marginBottom: 24 }}>
           <label style={{ display: "block", fontWeight: 600, marginBottom: 8, fontSize: 14 }}>
-            Learning Language
+            {t.settings.learningLanguage}
           </label>
           <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>
-            The language you want to learn
+            {t.settings.learningLanguageDesc}
           </p>
           <select
             value={settings.learningLanguageCode}
@@ -127,10 +132,10 @@ export default function Settings() {
 
         <div style={{ marginBottom: 24 }}>
           <label style={{ display: "block", fontWeight: 600, marginBottom: 8, fontSize: 14 }}>
-            Base Language
+            {t.settings.baseLanguage}
           </label>
           <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>
-            Your native language (used for translations)
+            {t.settings.baseLanguageDesc}
           </p>
           <select
             value={settings.baseLanguageCode}
@@ -153,10 +158,10 @@ export default function Settings() {
 
         <div style={{ marginBottom: 24 }}>
           <label style={{ display: "block", fontWeight: 600, marginBottom: 8, fontSize: 14 }}>
-            UI Language
+            {t.settings.uiLanguage}
           </label>
           <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>
-            Language for the app interface
+            {t.settings.uiLanguageDesc}
           </p>
           <select
             value={settings.UILanguageCode}
@@ -193,7 +198,7 @@ export default function Settings() {
               opacity: saving ? 0.6 : 1,
             }}
           >
-            {saving ? "Saving..." : "Save Settings"}
+            {saving ? t.common.saving : t.settings.saveSettings}
           </button>
           <button
             onClick={fetchSettings}
@@ -209,17 +214,17 @@ export default function Settings() {
               cursor: saving ? "not-allowed" : "pointer",
             }}
           >
-            Reset
+            {t.settings.reset}
           </button>
         </div>
       </div>
 
       <div style={{ marginTop: 32, padding: 16, background: "#f0f9ff", border: "1px solid #bfdbfe", borderRadius: 6 }}>
-        <h3 style={{ marginTop: 0, fontSize: 14, fontWeight: 600 }}>Current Settings</h3>
+        <h3 style={{ marginTop: 0, fontSize: 14, fontWeight: 600 }}>{t.settings.currentSettings}</h3>
         <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13 }}>
-          <li>Learning: <strong>{LANGUAGES.find(l => l.code === settings.learningLanguageCode)?.name}</strong></li>
-          <li>Base: <strong>{LANGUAGES.find(l => l.code === settings.baseLanguageCode)?.name}</strong></li>
-          <li>UI: <strong>{LANGUAGES.find(l => l.code === settings.UILanguageCode)?.name}</strong></li>
+          <li>{t.settings.learning}: <strong>{LANGUAGES.find(l => l.code === settings.learningLanguageCode)?.name}</strong></li>
+          <li>{t.settings.base}: <strong>{LANGUAGES.find(l => l.code === settings.baseLanguageCode)?.name}</strong></li>
+          <li>{t.settings.ui}: <strong>{LANGUAGES.find(l => l.code === settings.UILanguageCode)?.name}</strong></li>
         </ul>
       </div>
     </section>

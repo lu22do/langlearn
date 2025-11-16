@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { ISnippet, SnippetAnalysis } from "../../server/models/Snippet.js";
+import { useLocalization } from "../contexts/LocalizationContext";
 
 type Snippet = Omit<ISnippet, keyof Document> & { _id?: string };
 
@@ -11,6 +12,7 @@ interface SnippetCardProps {
 }
 
 export default function SnippetCard({ snippet, onDelete, saving, showDetails = true }: SnippetCardProps) {
+  const { t } = useLocalization();
   const [hoveredExample, setHoveredExample] = useState<number | null>(null);
   const [hoveredTranslation, setHoveredTranslation] = useState(false);
 
@@ -30,9 +32,9 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
           </div>
           
           <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 4 }}>
-            Language: <strong>{snippet.languageCode}</strong>
-            {'lemma' in snippet && snippet.lemma && <span style={{ marginLeft: 12 }}>Lemma: {snippet.lemma}</span>}
-            {'partOfSpeech' in snippet && snippet.partOfSpeech && <span style={{ marginLeft: 12 }}>POS: {snippet.partOfSpeech}</span>}
+            {t.snippetCard.language}: <strong>{snippet.languageCode}</strong>
+            {'lemma' in snippet && snippet.lemma && <span style={{ marginLeft: 12 }}>{t.snippetCard.lemma}: {snippet.lemma}</span>}
+            {'partOfSpeech' in snippet && snippet.partOfSpeech && <span style={{ marginLeft: 12 }}>{t.snippetCard.pos}: {snippet.partOfSpeech}</span>}
           </div>
 
           {showDetails && (
@@ -40,7 +42,7 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
               {/* AI-generated examples with hover tooltips */}
               {snippet.examples && snippet.examples.length > 0 && (
                 <div style={{ marginTop: 12, marginBottom: 8 }}>
-                  <strong style={{ fontSize: 13, color: "#374151" }}>Examples:</strong>
+                  <strong style={{ fontSize: 13, color: "#374151" }}>{t.snippetCard.examples}:</strong>
                   <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13, listStyle: "none" }}>
                     {snippet.examples.map((ex, idx) => (
                       <li 
@@ -86,7 +88,7 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
 
               {snippet.contextualExplanation && (
                 <div style={{ marginTop: 8, marginBottom: 8 }}>
-                  <strong style={{ fontSize: 13, color: "#374151" }}>Contextual Explanation:</strong>
+                  <strong style={{ fontSize: 13, color: "#374151" }}>{t.snippetCard.contextualExplanation}:</strong>
                   <p style={{ margin: "4px 0", fontSize: 13, color: "#4b5563" }}>
                     {snippet.contextualExplanation}
                   </p>
@@ -95,7 +97,7 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
 
               {snippet.explanations && snippet.explanations.length > 0 && (
                 <div style={{ marginTop: 8, marginBottom: 8 }}>
-                  <strong style={{ fontSize: 13, color: "#374151" }}>Grammar & Usage:</strong>
+                  <strong style={{ fontSize: 13, color: "#374151" }}>{t.snippetCard.grammarUsage}:</strong>
                   <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13 }}>
                     {snippet.explanations.map((ex, idx) => (
                       <li key={idx} style={{ color: "#4b5563" }}>{ex}</li>
@@ -106,7 +108,7 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
 
               {snippet.translation && (
                 <div style={{ marginTop: 8, marginBottom: 8 }}>
-                  <strong style={{ fontSize: 13, color: "#374151" }}>Translation:</strong>
+                  <strong style={{ fontSize: 13, color: "#374151" }}>{t.snippetCard.translation}:</strong>
                   <div 
                     style={{ 
                       margin: "4px 0", 
@@ -124,35 +126,35 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
                     {hoveredTranslation ? (
                       <span>{snippet.translation}</span>
                     ) : (
-                      <span style={{ color: "#9ca3af" }}>Hover to reveal</span>
+                      <span style={{ color: "#9ca3af" }}>{t.snippetCard.hoverToReveal}</span>
                     )}
                   </div>
                 </div>
               )}
 
+              {/* Source context */}
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#9ca3af",
+                  fontStyle: "italic",
+                  marginTop: 8,
+                  padding: 8,
+                  background: "#f9fafb",
+                  borderRadius: 4,
+                }}
+              >
+                <strong>{t.snippetCard.context}:</strong>{" "}
+                {snippet.sourceContext.length > 200
+                  ? snippet.sourceContext.substring(0, 200) + "..."
+                  : snippet.sourceContext}
+              </div>
             </>
           )}
 
-          {/* Source context */}
-          <div style={{
-            fontSize: 12,
-            color: "#9ca3af",
-            fontStyle: "italic",
-            marginTop: 8,
-            padding: 8,
-            background: "#f9fafb",
-            borderRadius: 4,
-          }}
-          >
-          <strong>Context:</strong>{" "}
-            {snippet.sourceContext.length > 200
-              ? snippet.sourceContext.substring(0, 200) + "..."
-              : snippet.sourceContext}
-          </div>
-
           {'createdAt' in snippet && snippet.createdAt && (
             <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 8 }}>
-              Created: {new Date(snippet.createdAt).toLocaleString()}
+              {t.common.created}: {new Date(snippet.createdAt).toLocaleString()}
             </div>
           )}
         </div>
@@ -165,14 +167,14 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
               style={{ 
                 padding: "6px 12px", 
                 fontSize: 13, 
-                background: "rgba(208, 95, 95, 1)", 
-                border: "1px solid rgba(209, 82, 82, 1)",
+                background: "#fee", 
+                border: "1px solid #fcc",
                 borderRadius: 4,
                 cursor: saving ? "not-allowed" : "pointer",
                 opacity: saving ? 0.6 : 1
               }}
             >
-              Delete
+              {t.common.delete}
             </button>
           </div>
         )}

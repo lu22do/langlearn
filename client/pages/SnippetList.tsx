@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ISnippet } from "../../server/models/Snippet.js";
+import { useLocalization } from "../contexts/LocalizationContext";
 import SnippetCard from "../components/SnippetCard";
 
 type Snippet = Omit<ISnippet, keyof Document> & { _id?: string }; 
 
 export default function SnippetList() {
+  const { t } = useLocalization();
   const navigate = useNavigate();
   const [savedSnippets, setSavedSnippets] = useState<Snippet[]>([]);
   const [saving, setSaving] = useState(false);
@@ -27,7 +29,7 @@ export default function SnippetList() {
       const data = await res.json();
       setSavedSnippets(Array.isArray(data) ? data : []);
     } catch (err: any) {
-      setError(err?.message ?? "Failed to load snippets");
+      setError(err?.message ?? t.snippetList.failedToLoad);
     } finally {
       setLoading(false);
     }
@@ -41,11 +43,11 @@ export default function SnippetList() {
     try {
       const res = await fetch(`/api/snippets/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
-      setSuccess("Snippet deleted");
+      setSuccess(t.snippetList.snippetDeleted);
       setTimeout(() => setSuccess(null), 3000);
       await fetchSnippets();
     } catch (err: any) {
-      setError(err?.message ?? "Failed to delete snippet");
+      setError(err?.message ?? t.snippetList.failedToDelete);
     } finally {
       setSaving(false);
     }
@@ -59,9 +61,9 @@ export default function SnippetList() {
 
   return (
     <section>
-      <h1>Snippets</h1>
+      <h1>{t.snippetList.title}</h1>
       <p style={{ color: "#6b7280", marginBottom: 24 }}>
-        Browse and manage your saved language snippets. Click on a card to view details.
+        {t.snippetList.subtitle}
       </p>
 
       {error && (
@@ -79,16 +81,16 @@ export default function SnippetList() {
       {/* Saved Snippets List */}
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <h2 style={{ margin: 0 }}>Saved Snippets ({savedSnippets.length})</h2>
+          <h2 style={{ margin: 0 }}>{t.snippetList.savedSnippets} ({savedSnippets.length})</h2>
           <button onClick={fetchSnippets} disabled={loading} style={{ padding: "8px 16px" }}>
-            {loading ? "Loading..." : "Refresh"}
+            {loading ? t.common.loading : t.common.refresh}
           </button>
         </div>
 
         {loading ? (
-          <p>Loading snippets...</p>
+          <p>{t.common.loading}</p>
         ) : savedSnippets.length === 0 ? (
-          <p style={{ color: "#6b7280" }}>No snippets saved yet. Create some!</p>
+          <p style={{ color: "#6b7280" }}>{t.snippetList.noSnippets}</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {savedSnippets.map((snippet) => (
