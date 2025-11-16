@@ -5,7 +5,7 @@ import SnippetCard from "../components/SnippetCard";
 
 type Snippet = Omit<ISnippet, keyof Document> & { _id?: string }; 
 
-export default function Snippets() {
+export default function SnippetList() {
   const navigate = useNavigate();
   const [savedSnippets, setSavedSnippets] = useState<Snippet[]>([]);
   const [saving, setSaving] = useState(false);
