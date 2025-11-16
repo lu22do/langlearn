@@ -3,10 +3,10 @@ import 'dotenv/config';
 import mongoose from "mongoose";
 import ViteExpress from "vite-express";
 import Snippet from "./models/Snippet.js";
-import { analyzeSnippet, generateFlashcards, generateQuiz } from "./ai.js";
+import Settings from "./models/Settings.js";
+import { analyzeSnippet } from "./ai.js";
 
 const app = express();
-// parse JSON and URL-encoded bodies so req.body is populated
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -17,6 +17,53 @@ console.log("Using MongoDB URI:", MONGODB_URI);
 mongoose.connect(MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
+
+// Settings endpoints
+app.get("/api/settings", async (req, res) => {
+  try {
+    // For now, we'll use a single global settings document (userId = null)
+    let settings = await Settings.findOne({ userId: null });
+    
+    // If no settings exist, create default ones
+    if (!settings) {
+      settings = new Settings({
+        userId: null,
+        baseLanguageCode: "en",
+        UILanguageCode: "en",
+        learningLanguageCode: "de",
+      });
+      await settings.save();
+    }
+    
+    res.json(settings);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch settings" });
+  }
+});
+
+app.put("/api/settings", async (req, res) => {
+  try {
+    const { baseLanguageCode, UILanguageCode, learningLanguageCode } = req.body;
+    
+    const update: any = {};
+    if (baseLanguageCode !== undefined) update.baseLanguageCode = baseLanguageCode;
+    if (UILanguageCode !== undefined) update.UILanguageCode = UILanguageCode;
+    if (learningLanguageCode !== undefined) update.learningLanguageCode = learningLanguageCode;
+
+    // Update or create settings
+    let settings = await Settings.findOneAndUpdate(
+      { userId: null },
+      update,
+      { new: true, upsert: true, runValidators: true }
+    );
+    
+    res.json(settings);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Error updating settings" });
+  }
+});
 
 // Snippet endpoints
 // Get all snippets with optional filtering by languageCode and tag

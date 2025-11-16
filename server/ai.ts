@@ -42,7 +42,7 @@ Format your response as JSON with this structure:
   "translation": "...",
 }
 
-For example, for the text "lustig" in German in the context of "etwas lustig zu machen", the response could look like this:
+For example, if the learning language is German and the based language is English, for the text "lustig" in the context of "etwas lustig zu machen", the response could look like this:
 {
   "contextualExplanation": "In this context of 'etwas lustig zu machen', 'lustig' translates to funny, indicating that the action involves adding humor to a situation or event.",
   "examples": [

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import type { SnippetAnalysis, ISnippet } from "../../server/models/Snippet.js";
+import { useSettings } from "../contexts/SettingsContext";
 
 type Snippet = Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & { _id?: string }; 
 
@@ -16,6 +17,7 @@ export default function Home() {
   const [hoveredExample, setHoveredExample] = useState<number | null>(null);
   const [hoveredTranslation, setHoveredTranslation] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const { settings } = useSettings();
 
   const MAX_CHARS = 20000;
   const charCount = prompt.length;
@@ -65,8 +67,8 @@ export default function Home() {
         body: JSON.stringify({
           text: rawText,
           context: prompt,
-          learning_language: "de",
-          base_language: "en"
+          learning_language: settings.learningLanguageCode,
+          base_language: settings.baseLanguageCode,
         }),
       });
 
@@ -79,7 +81,7 @@ export default function Home() {
       
       const newSnippet: PendingSnippetWithAnalysis = {
         rawText,
-        languageCode: "de",
+        languageCode: settings.learningLanguageCode,
         sourceContext: prompt,
         ...data.analysis
       };

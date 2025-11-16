@@ -1,8 +1,9 @@
 import "./css/index.css";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import { SettingsProvider } from "./contexts/SettingsContext";
 import Home from "./pages/Home";
 import Snippets from "./pages/Snippets";
 import Learn from "./pages/Learn";
@@ -63,6 +64,8 @@ export default App;
 const rootEl = document.getElementById("root") as HTMLElement;
 ReactDOM.createRoot(rootEl).render(
   <React.StrictMode>
-    <App />
+    <SettingsProvider>
+      <App />
+    </SettingsProvider>
   </React.StrictMode>,
 );
