@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import Home from "./pages/Home";
 import Snippets from "./pages/Snippets";
+import Snippet from "./pages/Snippet";
 import Learn from "./pages/Learn";
 import Quiz from "./pages/Quiz";
 import Settings from "./pages/Settings";
@@ -48,6 +49,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/snippets" element={<Snippets />} />
+            <Route path="/snippets/:id" element={<Snippet />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/settings" element={<Settings />} />

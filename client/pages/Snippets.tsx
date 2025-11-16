@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import type { ISnippet } from "../../server/models/Snippet.js";
 import SnippetCard from "../components/SnippetCard";
 
 type Snippet = Omit<ISnippet, keyof Document> & { _id?: string }; 
 
 export default function Snippets() {
+  const navigate = useNavigate();
   const [savedSnippets, setSavedSnippets] = useState<Snippet[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -49,11 +51,17 @@ export default function Snippets() {
     }
   };
 
+  const handleCardClick = (id?: string) => {
+    if (id) {
+      navigate(`/snippets/${id}`);
+    }
+  };
+
   return (
     <section>
       <h1>Snippets</h1>
       <p style={{ color: "#6b7280", marginBottom: 24 }}>
-        Browse and manage your saved language snippets.
+        Browse and manage your saved language snippets. Click on a card to view details.
       </p>
 
       {error && (
@@ -84,13 +92,17 @@ export default function Snippets() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {savedSnippets.map((snippet) => (
-              <SnippetCard
+              <div 
                 key={snippet._id}
-                snippet={snippet}
-                onDelete={deleteSnippet}
-                saving={saving}
-                showDetails={false}
-              />
+                onClick={() => handleCardClick(snippet._id)}
+                style={{ cursor: "pointer" }}
+              >
+                <SnippetCard
+                  snippet={snippet}
+                  saving={saving}
+                  showDetails={false}
+                />
+              </div>
             ))}
           </div>
         )}
