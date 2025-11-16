@@ -13,6 +13,8 @@ export default function Home() {
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [hoveredExample, setHoveredExample] = useState<number | null>(null);
+  const [hoveredTranslation, setHoveredTranslation] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const MAX_CHARS = 20000;
@@ -212,9 +214,39 @@ export default function Home() {
                         <strong style={{ fontSize: 13, color: "#374151" }}>Examples:</strong>
                         <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13, listStyle: "none" }}>
                           {pendingSnippet.examples.map((ex, idx) => (
-                            <li key={idx} style={{ marginBottom: 8 }}>
+                            <li 
+                              key={idx} 
+                              style={{ 
+                                marginBottom: 8,
+                                cursor: "pointer",
+                                padding: "6px 8px",
+                                borderRadius: 4,
+                                position: "relative"
+                              }}
+                              onMouseEnter={() => setHoveredExample(idx)}
+                              onMouseLeave={() => setHoveredExample(null)}
+                            >
                               <div style={{ color: "#1f2937", fontWeight: 500 }}>{ex.example}</div>
-                              <div style={{ color: "#6b7280", fontSize: 12, fontStyle: "italic" }}>{ex.translation}</div>
+                              {hoveredExample === idx && (
+                                <div style={{ 
+                                  position: "absolute",
+                                  bottom: "50%",
+                                  left: "25%",
+                                  transform: "translateX(-50%)",
+                                  marginBottom: 8,
+                                  padding: "8px 12px",
+                                  background: "#1f2937",
+                                  color: "#fff",
+                                  fontSize: 12,
+                                  borderRadius: 6,
+                                  whiteSpace: "nowrap",
+                                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                                  zIndex: 10,
+                                  maxWidth: "400px",
+                                }}>
+                                  {ex.translation}
+                                </div>
+                              )}
                             </li>
                           ))}
                         </ul>
@@ -242,7 +274,26 @@ export default function Home() {
                     {pendingSnippet.translation && (
                       <div>
                         <strong style={{ fontSize: 13, color: "#374151" }}>Translation:</strong>
-                        <p style={{ margin: "4px 0", fontSize: 13 }}>{pendingSnippet.translation}</p>
+                        <div 
+                          style={{ 
+                            margin: "4px 0", 
+                            fontSize: 13,
+                            cursor: "pointer",
+                            padding: "6px 8px",
+                            borderRadius: 4,
+                            background: hoveredTranslation ? "#f0f9ff" : "transparent",
+                            transition: "background 0.2s",
+                            display: "inline-block"
+                          }}
+                          onMouseEnter={() => setHoveredTranslation(true)}
+                          onMouseLeave={() => setHoveredTranslation(false)}
+                        >
+                          {hoveredTranslation ? (
+                            <span>{pendingSnippet.translation}</span>
+                          ) : (
+                            <span style={{ color: "#9ca3af" }}>Hover to reveal</span>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
