@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { LANGUAGES, type LanguageCode } from "../../shared/constants/languages";
+import { LANGUAGES, type LanguageCode } from "../../shared/constants/languages.js";
 
 export interface ISettings extends Document {
   userId?: string;
