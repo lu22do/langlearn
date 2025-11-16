@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import Home from "./pages/Home";
 import Snippets from "./pages/Snippets";
 import Learn from "./pages/Learn";
+import Quiz from "./pages/Quiz";
 import Settings from "./pages/Settings";
 
 function App() {
@@ -26,6 +27,9 @@ function App() {
           <NavLink to="/learn" className={activeClass}>
             Learn
           </NavLink>
+          <NavLink to="/quiz" className={activeClass}>
+            Quiz
+          </NavLink>
           <NavLink to="/settings" className={activeClass}>
             Settings
           </NavLink>
@@ -44,6 +48,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/snippets" element={<Snippets />} />
             <Route path="/learn" element={<Learn />} />
+            <Route path="/quiz" element={<Quiz />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </main>
