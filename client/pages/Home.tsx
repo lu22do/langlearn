@@ -100,7 +100,7 @@ export default function Home() {
   const saveSnippet = async (snippet: PendingSnippetWithAnalysis) => {
     setSaving(true);
     setError(null);
-console.log("Saving snippet:", snippet);
+
     try {
       const res = await fetch("/api/snippets", {
         method: "POST",
@@ -117,7 +117,6 @@ console.log("Saving snippet:", snippet);
       setSuccess(`Saved snippet: "${saved.rawText}" to database`);
       setTimeout(() => setSuccess(null), 3000);
       
-      // Remove from local list after saving
       setPendingSnippet(null);
     } catch (err: any) {
       setError(err?.message ?? "Failed to save snippet");
@@ -201,7 +200,7 @@ console.log("Saving snippet:", snippet);
                 background: "#eff6ff",
               }}
             >
-              <SnippetCard snippet={pendingSnippet} saving={saving} showTooltips={true} />
+              <SnippetCard snippet={pendingSnippet} saving={saving} showDetails={true} />
               
               <div style={{ display: "flex", gap: 8, marginTop: 16, paddingTop: 16, borderTop: "1px solid #bfdbfe" }}>
                 <button

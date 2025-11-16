@@ -89,6 +89,7 @@ export default function Snippets() {
                 snippet={snippet}
                 onDelete={deleteSnippet}
                 saving={saving}
+                showDetails={false}
               />
             ))}
           </div>
