@@ -4,3 +4,23 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+.snippet-header {
+  font-size: 16px;
+  color: #374151;
+}
+
+.snippet-container {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  background-color: rgb(252, 251, 251);
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+}
+
+.markdown-content { font-size: 13px; }
+.markdown-content h1 { font-size: 15px; font-weight: 600; margin-top: 12px; }
+.markdown-content h2 { font-size: 14px; font-weight: 600; margin-top: 10px; }
+.markdown-content p { margin: 4px 0; }
+.markdown-content ul, .markdown-content ol { padding-left: 20px; }
+.markdown-content code { background: #f3f4f6; padding: 2px 4px; border-radius: 3px; }

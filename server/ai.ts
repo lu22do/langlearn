@@ -1,13 +1,12 @@
 import OpenAI from "openai";
-import { LANGUAGES, getLanguageName } from "../shared/constants/languages.js";
+import { getLanguageName } from "../shared/constants/languages.js";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 interface AnalysisResult {
-  examples: string[];
-  explanations: string[]; // various meanings, grammar points, etc...
+  contextualExplanation: string;
+  examples: Array<{ example: string; translation: string }>;
+  explanations: string; // various meanings, grammar points, etc...
   translation: string;
 }
 
@@ -20,175 +19,100 @@ export async function analyzeSnippet(
   const learning_language = getLanguageName(learningLanguageCode) || learningLanguageCode;
   const base_language = getLanguageName(baseLanguageCode) || baseLanguageCode;
 
-  const prompt = `You are a language learning assistant. Analyze the following ${learning_language} text and provide a comprehensive learning breakdown.
+  // First call: Get structured JSON data
+  const jsonResponse = await client.chat.completions.create({
+    model: "gpt-4o-2024-08-06",
+    messages: [
+      {
+        role: "system",
+        content: `You are a language learning assistant. Analyze ${learning_language} text and provide structured data in ${base_language}.`,
+      },
+      {
+        role: "user",
+        content: `Analyze this ${learning_language} text:
 
 Text: "${text}"
 Context: "${context}"
 
-Please provide:
-1. Contextual meaning of the text in the context where it was found. If the context is the same as the text or the context is insufficient, go for the most common meaning.
-2. 3-4 example sentences for the most common usages (in ${learning_language} with ${base_language} translations).
-3. Each meaning with explanations about the structure, words, or usage and a set examples.
-4. ${base_language} translation.
+Provide:
+1. Contextual meaning of the text in the given context (or most common meaning if context is insufficient)
+2. 3-4 example sentences in ${learning_language} with ${base_language} translations
+3. ${base_language} translation of the text`,
+      },
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "language_analysis",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            contextualExplanation: {
+              type: "string",
+              description: "Contextual meaning of the text"
+            },
+            examples: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  example: { type: "string" },
+                  translation: { type: "string" }
+                },
+                required: ["example", "translation"],
+                additionalProperties: false
+              },
+              description: "3-4 example sentences with translations"
+            },
+            translation: {
+              type: "string",
+              description: "Translation to base language"
+            }
+          },
+          required: ["contextualExplanation", "examples", "translation"],
+          additionalProperties: false
+        }
+      }
+    }
+  });
 
-Format your response as JSON with this structure:
-{
-  "contextualExplanation": "...",
-  "examples": [
-    {"example": "...", "translation": "..."}, 
-    {"example": "...", "translation": "..."}, 
-    {"example": "...", "translation": "..."}
-  ],
-  "explanations": ["...", "...", "...", "..."],
-  "translation": "...",
-}
+  const jsonContent = jsonResponse.choices[0].message.content;
+  if (!jsonContent) {
+    throw new Error("No JSON content received from OpenAI");
+  }
+  const parsedJson = JSON.parse(jsonContent);
 
-For example, if the learning language is German and the based language is English, for the text "lustig" in the context of "etwas lustig zu machen", the response could look like this:
-{
-  "contextualExplanation": "In this context of 'etwas lustig zu machen', 'lustig' translates to funny, indicating that the action involves adding humor to a situation or event.",
-  "examples": [
-    {"example": "Der Lehrer wollte den Unterricht etwas lustig machen.", "translation": "The teacher wanted to make the lesson a bit funny."},
-    {"example": "Die Komödie war so lustig, dass wir alle laut gelacht haben.", "translation": "The comedy was so funny that we all laughed out loud."},
-    {"example": "Kannst du das etwas lustig machen, damit es interessanter wird?", "translation": "Can you make it a bit funny so that it becomes more interesting?"}
-  ],
-  "explanations": [
-    "'Lustig' generally means 'funny' or 'amusing.' It is used to describe something that causes laughter or entertainment. The word operates as an adjective in sentences, modifying nouns.",
-    "The phrase 'etwas lustig machen' implies the act of introducing humor into a situation. Here, 'etwas' means 'something,' 'lustig' means 'funny,' and 'machen' means 'to make.' It demonstrates an action focused on transforming a serious or bland context into a humorous experience.",
-    "'Lustig' can also pertain to a person's character or behavior, suggesting that someone is humorous or light-hearted. For example, 'Er ist sehr lustig' means 'He is very funny.'"
-  ],
-  "translation": "funny"
-}`;
-
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+  // Second call: Get markdown explanation
+  const markdownResponse = await client.chat.completions.create({
+    model: "gpt-4o-2024-08-06",
     messages: [
       {
         role: "system",
-        content: "You are a helpful language learning assistant. Always respond with valid JSON.",
+        content: `You are a language learning assistant. Provide detailed explanations in markdown format.`,
       },
       {
         role: "user",
-        content: prompt,
+        content: `Provide a detailed markdown explanation for this ${learning_language} text: "${text}"
+
+Include:
+- All possible meanings
+- Grammar points and structure
+- Usage notes
+- Additional examples with explanations`,
       },
     ],
-    response_format: { type: "json_object" },
   });
 
-  const content = response.choices[0].message.content;
-  if (!content) {
-    throw new Error("No response from OpenAI");
+  const markdownContent = markdownResponse.choices[0].message.content;
+  if (!markdownContent) {
+    throw new Error("No markdown content received from OpenAI");
   }
 
-  return JSON.parse(content);
-}
-
-interface FlashcardSuggestion {
-  front: string;
-  back: string;
-}
-
-export async function generateFlashcards(
-  snippet: string,
-  translation: string,
-  language: string
-): Promise<FlashcardSuggestion[]> {
-  const prompt = `Based on this ${language} snippet and its translation, generate 2-3 useful flashcards for learning.
-
-Snippet: "${snippet}"
-Translation: "${translation}"
-
-Create flashcards that help learn:
-- The main phrase/sentence
-- Key vocabulary words
-- Important grammar patterns
-
-Format as JSON:
-{
-  "flashcards": [
-    {"front": "${language} text", "back": "English meaning"},
-    {"front": "${language} text", "back": "English meaning"}
-  ]
-}`;
-
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are a language learning assistant creating flashcards. Always respond with valid JSON.",
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    response_format: { type: "json_object" },
-  });
-
-  const content = response.choices[0].message.content;
-  if (!content) {
-    throw new Error("No response from OpenAI");
-  }
-
-  const result = JSON.parse(content);
-  return result.flashcards;
-}
-
-interface QuizQuestion {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-}
-
-export async function generateQuiz(
-  snippet: string,
-  translation: string,
-  grammar: string[],
-  language: string
-): Promise<QuizQuestion> {
-  const prompt = `Create a multiple-choice quiz question based on this ${language} learning material:
-
-Snippet: "${snippet}"
-Translation: "${translation}"
-Grammar points: ${grammar.join("; ")}
-
-Create ONE quiz question that tests understanding of:
-- Translation/meaning
-- Grammar usage
-- Vocabulary
-
-Provide 4 options with only one correct answer.
-
-Format as JSON:
-{
-  "question": "...",
-  "options": ["option1", "option2", "option3", "option4"],
-  "correctAnswer": 0,
-  "explanation": "Brief explanation of the correct answer"
-}
-
-correctAnswer should be the index (0-3) of the correct option.`;
-
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are a language learning assistant creating quiz questions. Always respond with valid JSON.",
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    response_format: { type: "json_object" },
-  });
-
-  const content = response.choices[0].message.content;
-  if (!content) {
-    throw new Error("No response from OpenAI");
-  }
-
-  return JSON.parse(content);
+  return {
+    contextualExplanation: parsedJson.contextualExplanation,
+    examples: parsedJson.examples,
+    explanations: markdownContent,
+    translation: parsedJson.translation,
+  };
 }

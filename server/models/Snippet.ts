@@ -8,7 +8,7 @@ export interface ExampleWithTranslation {
 export interface SnippetAnalysis {
   contextualExplanation?: string;
   examples?: ExampleWithTranslation[];
-  explanations?: string[];
+  explanations?: string; // Markdown formatted detailed explanations
   translation?: string;
 }
 
@@ -45,7 +45,7 @@ const snippetSchema = new Schema<ISnippet>(
       }],
       default: []
     },
-    explanations: { type: [String] },
+    explanations: { type: String },
     translation: { type: String },
   },
   { timestamps: true }

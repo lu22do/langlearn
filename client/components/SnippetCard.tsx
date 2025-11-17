@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import type { ISnippet, SnippetAnalysis } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
 
@@ -41,8 +42,8 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
             <>
               {/* AI-generated examples with hover tooltips */}
               {snippet.examples && snippet.examples.length > 0 && (
-                <div style={{ marginTop: 12, marginBottom: 8 }}>
-                  <strong style={{ fontSize: 13, color: "#374151" }}>{t.snippetCard.examples}:</strong>
+                <div className="snippet-container">
+                  <strong className="snippet-header">{t.snippetCard.examples}:</strong>
                   <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13, listStyle: "none" }}>
                     {snippet.examples.map((ex, idx) => (
                       <li 
@@ -87,28 +88,26 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
               )}
 
               {snippet.contextualExplanation && (
-                <div style={{ marginTop: 8, marginBottom: 8 }}>
-                  <strong style={{ fontSize: 13, color: "#374151" }}>{t.snippetCard.contextualExplanation}:</strong>
+                <div className="snippet-container">
+                  <strong className="snippet-header">{t.snippetCard.contextualExplanation}:</strong>
                   <p style={{ margin: "4px 0", fontSize: 13, color: "#4b5563" }}>
                     {snippet.contextualExplanation}
                   </p>
                 </div>
               )}
 
-              {snippet.explanations && snippet.explanations.length > 0 && (
-                <div style={{ marginTop: 8, marginBottom: 8 }}>
-                  <strong style={{ fontSize: 13, color: "#374151" }}>{t.snippetCard.grammarUsage}:</strong>
-                  <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13 }}>
-                    {snippet.explanations.map((ex, idx) => (
-                      <li key={idx} style={{ color: "#4b5563" }}>{ex}</li>
-                    ))}
-                  </ul>
+              {snippet.explanations && (
+                <div className="snippet-container">
+                  <strong className="snippet-header">{t.snippetCard.grammarUsage}:</strong>
+                  <div className="markdown-content">
+                    <ReactMarkdown>{snippet.explanations}</ReactMarkdown>
+                  </div>
                 </div>
               )}
 
               {snippet.translation && (
-                <div style={{ marginTop: 8, marginBottom: 8 }}>
-                  <strong style={{ fontSize: 13, color: "#374151" }}>{t.snippetCard.translation}:</strong>
+                <div className="snippet-container">
+                  <strong className="snippet-header">{t.snippetCard.translation}:</strong>
                   <div 
                     style={{ 
                       margin: "4px 0", 
@@ -144,7 +143,7 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
                   borderRadius: 4,
                 }}
               >
-                <strong>{t.snippetCard.context}:</strong>{" "}
+                <strong className="snippet-header">{t.snippetCard.context}:</strong>{" "}
                 {snippet.sourceContext.length > 200
                   ? snippet.sourceContext.substring(0, 200) + "..."
                   : snippet.sourceContext}
