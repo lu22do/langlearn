@@ -69,6 +69,7 @@ export default function Home() {
           context: prompt,
           learning_language: settings.learningLanguageCode,
           base_language: settings.baseLanguageCode,
+          ui_language: settings.UILanguageCode,
         }),
       });
 

@@ -11,12 +11,14 @@
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "github-markdown-css": "^5.8.1",
     "mongoose": "^8.19.2",
     "openai": "^6.9.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.9.5",
+    "remark-gfm": "^4.0.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3",
     "vite-express": "*"

@@ -22,14 +22,14 @@ export function registerSnippetRoutes(app: Express) {
   // Analyze snippet with AI
   app.post("/api/snippets/analyze", async (req, res) => {
     try {
-      const { text, context, learning_language, base_language } = req.body;
+      const { text, context, learning_language, base_language, ui_language } = req.body;
       
-      if (!text || !context || !learning_language) {
-        return res.status(400).json({ error: "Text and learning language are required" });
+      if (!text || !context || !learning_language || !base_language || !ui_language) {
+        return res.status(400).json({ error: "Text, context and languages are required" });
       }
 
       // Get AI analysis
-      const analysis = await analyzeSnippet(text, context, learning_language, base_language);
+      const analysis = await analyzeSnippet(text, context, learning_language, base_language, ui_language);
 
       res.json({ text, analysis });
     } catch (error: any) {
@@ -40,7 +40,7 @@ export function registerSnippetRoutes(app: Express) {
 
   // Store new snippet
   app.post('/api/snippets', async (req, res) => {
-    console.log("POST /api/snippets called with body:", req.body);
+    //console.log("POST /api/snippets called with body:", req.body);
     
     const { 
       rawText, 

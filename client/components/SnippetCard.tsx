@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import 'github-markdown-css';
 import type { ISnippet, SnippetAnalysis } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
 
@@ -99,8 +101,10 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
               {snippet.explanations && (
                 <div className="snippet-container">
                   <strong className="snippet-header">{t.snippetCard.grammarUsage}:</strong>
-                  <div className="markdown-content">
-                    <ReactMarkdown>{snippet.explanations}</ReactMarkdown>
+                  <div className="markdown-content markdown-body">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {snippet.explanations}
+                    </ReactMarkdown>
                   </div>
                 </div>
               )}
@@ -166,7 +170,7 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
               style={{ 
                 padding: "6px 12px", 
                 fontSize: 13, 
-                background: "#fee", 
+                background: "rgba(220, 83, 83, 1)", 
                 border: "1px solid #fcc",
                 borderRadius: 4,
                 cursor: saving ? "not-allowed" : "pointer",

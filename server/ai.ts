@@ -14,30 +14,32 @@ export async function analyzeSnippet(
   text: string,
   context: string,
   learningLanguageCode: string,
-  baseLanguageCode: string
+  baseLanguageCode: string,
+  uiLanguageCode: string
 ): Promise<AnalysisResult> {
   const learning_language = getLanguageName(learningLanguageCode) || learningLanguageCode;
   const base_language = getLanguageName(baseLanguageCode) || baseLanguageCode;
+  const ui_language = getLanguageName(uiLanguageCode) || uiLanguageCode;
 
   // First call: Get structured JSON data
   const jsonResponse = await client.chat.completions.create({
-    model: "gpt-4o-2024-08-06",
+    model: "gpt-4.1-mini",
     messages: [
       {
         role: "system",
-        content: `You are a language learning assistant. Analyze ${learning_language} text and provide structured data in ${base_language}.`,
+        content: `You are a language learning assistant. Analyze the ${learning_language} text language and provide structured data in ${ui_language} language`,
       },
       {
         role: "user",
         content: `Analyze this ${learning_language} text:
 
-Text: "${text}"
+Text_to_explain: "${text}"
 Context: "${context}"
 
 Provide:
-1. Contextual meaning of the text in the given context (or most common meaning if context is insufficient)
+1. Contextual meaning of the Text_to_explain in the given Context (or most common meaning if context is insufficient) in ${ui_language}
 2. 3-4 example sentences in ${learning_language} with ${base_language} translations
-3. ${base_language} translation of the text`,
+3. ${base_language} translation of the Text_to_explain`,
       },
     ],
     response_format: {
@@ -85,15 +87,15 @@ Provide:
 
   // Second call: Get markdown explanation
   const markdownResponse = await client.chat.completions.create({
-    model: "gpt-4o-2024-08-06",
+    model: "gpt-4.1-mini",
     messages: [
       {
         role: "system",
-        content: `You are a language learning assistant. Provide detailed explanations in markdown format.`,
+        content: `You are a language learning assistant. Provide detailed explanations in raw markdown format in ${ui_language} language. Do NOT wrap your response in triple-backtick code fences. Return only the markdown content.`,
       },
       {
         role: "user",
-        content: `Provide a detailed markdown explanation for this ${learning_language} text: "${text}"
+        content: `Provide a detailed explanation for this ${learning_language} text: "${text}" in ${ui_language} language.
 
 Include:
 - All possible meanings
