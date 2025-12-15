@@ -167,15 +167,7 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
             <button
               onClick={() => onDelete(snippet._id)}
               disabled={saving}
-              style={{ 
-                padding: "6px 12px", 
-                fontSize: 13, 
-                background: "rgba(220, 83, 83, 1)", 
-                border: "1px solid #fcc",
-                borderRadius: 4,
-                cursor: saving ? "not-allowed" : "pointer",
-                opacity: saving ? 0.6 : 1
-              }}
+              className="delete-button"
             >
               {t.common.delete}
             </button>
