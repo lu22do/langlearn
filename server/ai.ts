@@ -21,8 +21,20 @@ export async function analyzeSnippet(
   const base_language = getLanguageName(baseLanguageCode) || baseLanguageCode;
   const ui_language = getLanguageName(uiLanguageCode) || uiLanguageCode;
 
-  // First call: Get structured JSON data
-  const jsonResponse = await client.chat.completions.create({
+  // Small helper to strip triple-backtick fences from markdown responses
+  const stripCodeFences = (s: string) => {
+    if (!s) return s;
+    let out = s.trim();
+    if (!out.startsWith("```")) return out;
+    const firstNewline = out.indexOf('\n');
+    if (firstNewline !== -1) out = out.substring(firstNewline + 1);
+    else out = out.replace(/^```.*?\n?/, "");
+    if (out.endsWith("```")) out = out.substring(0, out.length - 3);
+    return out.trim();
+  };
+
+  // Prepare both requests and execute them in parallel to reduce latency
+  const jsonPromise = client.chat.completions.create({
     model: "gpt-4.1-mini",
     messages: [
       {
@@ -79,23 +91,16 @@ Provide:
     }
   });
 
-  const jsonContent = jsonResponse.choices[0].message.content;
-  if (!jsonContent) {
-    throw new Error("No JSON content received from OpenAI");
-  }
-  const parsedJson = JSON.parse(jsonContent);
-
-  // Second call: Get markdown explanation
-  const markdownResponse = await client.chat.completions.create({
+  const markdownPromise = client.chat.completions.create({
     model: "gpt-4.1-mini",
     messages: [
       {
         role: "system",
-        content: `You are a language learning assistant. Provide detailed explanations in raw markdown format in ${ui_language} language. Do NOT wrap your response in triple-backtick code fences. Return only the markdown content.`,
+        content: `You are a language learning assistant. Provide detailed explanations in raw markdown format in ${ui_language} language. Do NOT wrap the response in triple-backtick fences.`,
       },
       {
         role: "user",
-        content: `Provide a detailed explanation for this ${learning_language} text: "${text}" in ${ui_language} language.
+        content: `Provide a detailed explanation for this ${learning_language} text: "${text}" in ${ui_language} language. Return only markdown content (no surrounding code fences).
 
 Include:
 - All possible meanings
@@ -106,10 +111,25 @@ Include:
     ],
   });
 
-  const markdownContent = markdownResponse.choices[0].message.content;
-  if (!markdownContent) {
-    throw new Error("No markdown content received from OpenAI");
+  const [jsonResponse, markdownResponse] = await Promise.all([jsonPromise, markdownPromise]);
+
+  // Parse JSON result (fallback to extracting fenced JSON if necessary)
+  const jsonContent = jsonResponse.choices?.[0]?.message?.content;
+  if (!jsonContent) throw new Error("No JSON content received from OpenAI");
+
+  let parsedJson;
+  try {
+    parsedJson = JSON.parse(jsonContent);
+  } catch (err) {
+    const match = jsonContent.match(/```(?:json)?\n([\s\S]*?)\n```/);
+    if (match) parsedJson = JSON.parse(match[1]);
+    else throw new Error("Unable to parse JSON content from OpenAI response");
   }
+
+  // Normalize markdown result
+  let markdownContent = markdownResponse.choices?.[0]?.message?.content;
+  if (!markdownContent) throw new Error("No markdown content received from OpenAI");
+  markdownContent = stripCodeFences(markdownContent);
 
   return {
     contextualExplanation: parsedJson.contextualExplanation,
