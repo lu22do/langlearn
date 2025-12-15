@@ -10,6 +10,14 @@ interface AnalysisResult {
   translation: string;
 }
 
+export interface QuizQuestion {
+  rawText: string;
+  question: string;
+  choices: string[];
+  answerIndex: number;
+  explanation?: string;
+}
+
 export async function analyzeSnippet(
   text: string,
   context: string,
@@ -137,4 +145,92 @@ Include:
     explanations: markdownContent,
     translation: parsedJson.translation,
   };
+}
+
+export async function generateQuiz(
+  snippets: Array<{ rawText: string; languageCode?: string; sourceContext?: string }>,
+  uiLanguageCode: string,
+  format: "multiple_choice" | "fill_in_blank" = "multiple_choice",
+  numChoices = 4
+): Promise<QuizQuestion[]> {
+  if (!snippets || snippets.length === 0) return [];
+
+  const ui_language = getLanguageName(uiLanguageCode) || uiLanguageCode;
+
+  // Build prompt
+  const payload = snippets
+    .map((s, i) => `#${i + 1} (${s.languageCode || "unknown"}): ${s.rawText}`)
+    .join("\n\n");
+
+  const userPrompt = `Create a quiz of ${snippets.length} ${format} questions based on the following snippets. Respond with a JSON object containing a single property "questions" which is an array of objects. Each object should contain: rawText, question (in ${ui_language}), choices (array of ${numChoices} strings), answerIndex (0-based), and a short explanation (in ${ui_language}).\n\nSnippets:\n${payload}\n\nRules:\n- For multiple_choice, provide exactly ${numChoices} choices and ensure one is correct.\n- Keep questions concise and learner-focused.\n- Make distractors plausible and similar in meaning to the correct answer.`;
+
+  const response = await client.chat.completions.create({
+    model: "gpt-4.1-mini",
+    messages: [
+      { role: "system", content: `You are a language learning quiz author. Generate concise quiz questions in ${ui_language}.` },
+      { role: "user", content: userPrompt }
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "quiz_generation",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            questions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  rawText: { type: "string" },
+                  question: { type: "string" },
+                  choices: {
+                    type: "array",
+                    items: { type: "string" }
+                  },
+                  answerIndex: { type: "number" },
+                  explanation: { type: "string" }
+                },
+                required: ["rawText", "question", "choices", "answerIndex", "explanation"],
+                additionalProperties: false
+              }
+            }
+          },
+          required: ["questions"],
+          additionalProperties: false
+        }
+      }
+    }
+  });
+
+  const content = response.choices?.[0]?.message?.content;
+  if (!content) throw new Error("No content from quiz generation");
+
+  return parseQuizContent(content);
+}
+
+export function parseQuizContent(c: string): QuizQuestion[] {
+  let p: any;
+  try {
+    p = JSON.parse(c);
+  } catch (err) {
+    const match = c.match(/```(?:json)?\n([\s\S]*?)\n```/);
+    if (match) {
+      try {
+        p = JSON.parse(match[1]);
+      } catch (e) {
+        throw new Error("Could not parse quiz generation response (inner JSON)");
+      }
+    } else {
+      throw new Error("Could not parse quiz generation response");
+    }
+  }
+
+  // Support either { questions: [...] } (preferred) or fallback to array
+  if (Array.isArray(p)) return p as QuizQuestion[];
+  if (p && Array.isArray(p.questions)) return p.questions as QuizQuestion[];
+  if (p && Array.isArray(p.quiz)) return p.quiz as QuizQuestion[]; // alternate key
+
+  throw new Error("Quiz response JSON does not contain questions array");
 }

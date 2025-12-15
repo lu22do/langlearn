@@ -1,6 +1,6 @@
 import { Express } from "express";
 import Snippet from "../models/Snippet.js";
-import { analyzeSnippet } from "../ai.js";
+import { analyzeSnippet, generateQuiz } from "../ai.js";
 
 export function registerSnippetRoutes(app: Express) {
   // Get all snippets with optional filtering by languageCode and tag
@@ -35,6 +35,30 @@ export function registerSnippetRoutes(app: Express) {
     } catch (error: any) {
       console.error("Error analyzing snippet:", error);
       res.status(500).json({ error: error.message || "Failed to analyze snippet" });
+    }
+  });
+
+  // Generate a quiz from random snippets
+  app.get('/api/quiz', async (req, res) => {
+    try {
+      const size = parseInt((req.query.size as string) || '5', 10);
+      const ui_language = (req.query.ui_language as string) || 'en';
+
+      // sample random snippets
+      const snippets = await Snippet.aggregate([
+        { $sample: { size } },
+        { $project: { rawText: 1, languageCode: 1, sourceContext: 1, _id: 0 } }
+      ]);
+
+      if (!snippets || snippets.length === 0) {
+        return res.status(404).json({ message: 'No snippets available for quiz' });
+      }
+
+      const quiz = await generateQuiz(snippets, ui_language, 'multiple_choice', 4);
+      res.json({ quiz });
+    } catch (err: any) {
+      console.error('Error generating quiz:', err);
+      res.status(500).json({ message: 'Failed to generate quiz' });
     }
   });
 
