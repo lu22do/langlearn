@@ -4,7 +4,7 @@ export const ja: TranslationKeys = {
   nav: {
     home: "ホーム",
     snippets: "スニペット",
-    learn: "学習",
+    learn: "復習",
     quiz: "クイズ",
     settings: "設定",
   },
@@ -95,7 +95,7 @@ export const ja: TranslationKeys = {
   },
   
   learn: {
-    title: "学習",
+    title: "復習",
     subtitle: "保存されたスニペットを復習して練習します。",
     comingSoon: "近日公開...",
   },

@@ -3,7 +3,7 @@ export const en = {
   nav: {
     home: "Home",
     snippets: "Snippets",
-    learn: "Learn",
+    learn: "Review",
     quiz: "Quiz",
     settings: "Settings",
   },
@@ -101,7 +101,7 @@ export const en = {
   
   // Learn page
   learn: {
-    title: "Learn",
+    title: "Review",
     subtitle: "Review your saved snippets and practice.",
     comingSoon: "Coming soon...",
   },

@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocalization } from "../contexts/LocalizationContext";
 
-export default function Learn() {
+export default function Review() {
   const { t } = useLocalization();
   
   return (

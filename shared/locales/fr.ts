@@ -4,7 +4,7 @@ export const fr: TranslationKeys = {
   nav: {
     home: "Accueil",
     snippets: "Extraits",
-    learn: "Apprendre",
+    learn: "Révision",
     quiz: "Quiz",
     settings: "Paramètres",
   },
@@ -95,7 +95,7 @@ export const fr: TranslationKeys = {
   },
   
   learn: {
-    title: "Apprendre",
+    title: "Révision",
     subtitle: "Révisez vos extraits enregistrés et pratiquez.",
     comingSoon: "Bientôt disponible...",
   },

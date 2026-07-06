@@ -9,7 +9,7 @@ import { useLocalization } from "./contexts/LocalizationContext";
 import Home from "./pages/Home";
 import SnippetList from "./pages/SnippetList";
 import Snippet from "./pages/Snippet";
-import Learn from "./pages/Learn";
+import Review from "./pages/Review";
 import Quiz from "./pages/Quiz";
 import Settings from "./pages/Settings";
 
@@ -54,7 +54,7 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/snippets" element={<SnippetList />} />
             <Route path="/snippets/:id" element={<Snippet />} />
-            <Route path="/learn" element={<Learn />} />
+            <Route path="/learn" element={<Review />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
