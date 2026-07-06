@@ -30,7 +30,7 @@ function AppContent() {
           <NavLink to="/snippets" className={activeClass}>
             {t.nav.snippets}
           </NavLink>
-          <NavLink to="/learn" className={activeClass}>
+          <NavLink to="/review" className={activeClass}>
             {t.nav.learn}
           </NavLink>
           <NavLink to="/quiz" className={activeClass}>
@@ -54,7 +54,7 @@ function AppContent() {
             <Route path="/" element={<Home />} />
             <Route path="/snippets" element={<SnippetList />} />
             <Route path="/snippets/:id" element={<Snippet />} />
-            <Route path="/learn" element={<Review />} />
+            <Route path="/review" element={<Review />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
