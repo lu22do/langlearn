@@ -10,6 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/myViteAppDB";
+const PORT = Number(process.env.PORT) || 3000;
 
 console.log("Using MongoDB URI:", MONGODB_URI);
 
@@ -21,6 +22,6 @@ mongoose.connect(MONGODB_URI)
 registerSettingsRoutes(app);
 registerSnippetRoutes(app);
 
-ViteExpress.listen(app, 3000, () =>
-  console.log("Server is listening on port 3000..."),
+ViteExpress.listen(app, PORT, () =>
+  console.log(`Server is listening on port ${PORT}...`),
 );

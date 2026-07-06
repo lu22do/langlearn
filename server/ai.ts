@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { getLanguageName } from "../shared/constants/languages.js";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
 interface AnalysisResult {
   contextualExplanation: string;
@@ -43,7 +44,7 @@ export async function analyzeSnippet(
 
   // Prepare both requests and execute them in parallel to reduce latency
   const jsonPromise = client.chat.completions.create({
-    model: "gpt-4.1-mini",
+    model: OPENAI_MODEL,
     messages: [
       {
         role: "system",
@@ -100,7 +101,7 @@ Provide:
   });
 
   const markdownPromise = client.chat.completions.create({
-    model: "gpt-4.1-mini",
+    model: OPENAI_MODEL,
     messages: [
       {
         role: "system",
@@ -165,7 +166,7 @@ export async function generateQuiz(
   const userPrompt = `Create a quiz of ${snippets.length} ${format} questions based on the following snippets. Respond with a JSON object containing a single property "questions" which is an array of objects. Each object should contain: rawText, question (in ${ui_language}), choices (array of ${numChoices} strings), answerIndex (0-based), and a short explanation (in ${ui_language}).\n\nSnippets:\n${payload}\n\nRules:\n- For multiple_choice, provide exactly ${numChoices} choices and ensure one is correct.\n- Keep questions concise and learner-focused.\n- Make distractors plausible and similar in meaning to the correct answer.`;
 
   const response = await client.chat.completions.create({
-    model: "gpt-4.1-mini",
+    model: OPENAI_MODEL,
     messages: [
       { role: "system", content: `You are a language learning quiz author. Generate concise quiz questions in ${ui_language}.` },
       { role: "user", content: userPrompt }
