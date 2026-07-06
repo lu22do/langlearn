@@ -33,14 +33,14 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
             {snippet.rawText}
           </div>
           
-          <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 4 }}>
-            {t.snippetCard.language}: <strong>{snippet.languageCode}</strong>
-            {'lemma' in snippet && snippet.lemma && <span style={{ marginLeft: 12 }}>{t.snippetCard.lemma}: {snippet.lemma}</span>}
-            {'partOfSpeech' in snippet && snippet.partOfSpeech && <span style={{ marginLeft: 12 }}>{t.snippetCard.pos}: {snippet.partOfSpeech}</span>}
-          </div>
-
           {showDetails && (
             <>
+              <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 4 }}>
+                {t.snippetCard.language}: <strong>{snippet.languageCode}</strong>
+                {'lemma' in snippet && snippet.lemma && <span style={{ marginLeft: 12 }}>{t.snippetCard.lemma}: {snippet.lemma}</span>}
+                {'partOfSpeech' in snippet && snippet.partOfSpeech && <span style={{ marginLeft: 12 }}>{t.snippetCard.pos}: {snippet.partOfSpeech}</span>}
+              </div>
+              
               {/* AI-generated examples with hover tooltips */}
               {snippet.examples && snippet.examples.length > 0 && (
                 <div className="snippet-container">
@@ -151,14 +151,14 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
                   ? snippet.sourceContext.substring(0, 200) + "..."
                   : snippet.sourceContext}
               </div>
-            </>
-          )}
 
-          {'createdAt' in snippet && snippet.createdAt && (
-            <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 8 }}>
-              {t.common.created}: {new Date(snippet.createdAt).toLocaleString()}
-            </div>
-          )}
+              {'createdAt' in snippet && snippet.createdAt && (
+                <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 8 }}>
+                  {t.common.created}: {new Date(snippet.createdAt).toLocaleString()}
+                </div>
+              )}
+           </>
+         )}
         </div>
 
         {onDelete && (
