@@ -10,10 +10,9 @@ interface SnippetCardProps {
   snippet: Snippet | (Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & SnippetAnalysis & { _id?: string });
   onDelete?: (id?: string) => void;
   saving?: boolean;
-  showDetails?: boolean; // Show all analysis details (examples, explanations, etc.)
 }
 
-export default function SnippetCard({ snippet, onDelete, saving, showDetails = true }: SnippetCardProps) {
+export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardProps) {
   const { t } = useLocalization();
   const [hoveredExample, setHoveredExample] = useState<number | null>(null);
   const [hoveredTranslation, setHoveredTranslation] = useState(false);
@@ -33,14 +32,13 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
             {snippet.rawText}
           </div>
           
-          {showDetails && (
-            <>
+          <>
               <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 4 }}>
                 {t.snippetCard.language}: <strong>{snippet.languageCode}</strong>
                 {'lemma' in snippet && snippet.lemma && <span style={{ marginLeft: 12 }}>{t.snippetCard.lemma}: {snippet.lemma}</span>}
                 {'partOfSpeech' in snippet && snippet.partOfSpeech && <span style={{ marginLeft: 12 }}>{t.snippetCard.pos}: {snippet.partOfSpeech}</span>}
               </div>
-              
+
               {/* AI-generated examples with hover tooltips */}
               {snippet.examples && snippet.examples.length > 0 && (
                 <div className="snippet-container">
@@ -158,7 +156,6 @@ export default function SnippetCard({ snippet, onDelete, saving, showDetails = t
                 </div>
               )}
            </>
-         )}
         </div>
 
         {onDelete && (

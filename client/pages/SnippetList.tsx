@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ISnippet } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
-import SnippetCard from "../components/SnippetCard";
 
 type Snippet = Omit<ISnippet, keyof Document> & { _id?: string }; 
 
@@ -59,6 +58,14 @@ export default function SnippetList() {
     }
   };
 
+  const getPreviewText = (snippet: Snippet) => {
+    const context = snippet.sourceContext?.trim();
+    if (context) return context;
+
+    const firstExample = snippet.examples?.find((example) => example?.example?.trim());
+    return firstExample?.example?.trim() || "";
+  };
+
   return (
     <section>
       <h1>{t.snippetList.title}</h1>
@@ -92,20 +99,52 @@ export default function SnippetList() {
         ) : savedSnippets.length === 0 ? (
           <p style={{ color: "#6b7280" }}>{t.snippetList.noSnippets}</p>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {savedSnippets.map((snippet) => (
-              <div 
-                key={snippet._id}
-                onClick={() => handleCardClick(snippet._id)}
-                style={{ cursor: "pointer" }}
-              >
-                <SnippetCard
-                  snippet={snippet}
-                  saving={saving}
-                  showDetails={false}
-                />
-              </div>
-            ))}
+          <div style={{ overflowX: "auto", display: "flex", justifyContent: "center" }}>
+            <table style={{ width: "100%", minWidth: 1200, borderCollapse: "collapse", background: "#fff" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid #e5e7eb", textAlign: "left" }}>
+                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280" }}>{t.snippetList.title}</th>
+                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280", width: "90%" }}>{t.snippetCard.examples}</th>
+                  <th style={{ padding: "12px 10px", width: 80 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {savedSnippets.map((snippet) => {
+                  const previewText = getPreviewText(snippet);
+                  return (
+                    <tr
+                      key={snippet._id}
+                      onClick={() => handleCardClick(snippet._id)}
+                      style={{ borderBottom: "1px solid #f3f4f6", cursor: "pointer", transition: "background 0.2s" }}
+                      onMouseEnter={(event) => {
+                        event.currentTarget.style.background = "#f9fafb";
+                      }}
+                      onMouseLeave={(event) => {
+                        event.currentTarget.style.background = "transparent";
+                      }}
+                    >
+                      <td style={{ padding: "12px 10px", fontSize: 16, fontWeight: 600, color: "#111827" }}>
+                        {snippet.rawText}
+                      </td>
+                      <td style={{ padding: "12px 10px", fontSize: 15, color: "#4b5563", maxWidth: 480 }}>
+                        <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {previewText}
+                        </div>
+                      </td>
+                      <td style={{ padding: "12px 10px" }} onClick={(event) => event.stopPropagation()}>
+                        <button
+                          onClick={() => deleteSnippet(snippet._id)}
+                          disabled={saving}
+                          style={{ padding: "6px 10px", fontSize: 12 }}
+                        >
+                          {t.common.delete}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

@@ -202,7 +202,7 @@ export default function Home() {
                 background: "#eff6ff",
               }}
             >
-              <SnippetCard snippet={pendingSnippet} saving={saving} showDetails={true} />
+              <SnippetCard snippet={pendingSnippet} saving={saving} />
               
               <div style={{ display: "flex", gap: 8, marginTop: 16, paddingTop: 16, borderTop: "1px solid #bfdbfe" }}>
                 <button

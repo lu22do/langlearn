@@ -114,7 +114,6 @@ export default function Snippet() {
           snippet={snippet} 
           onDelete={handleDelete}
           saving={deleting}
-          showDetails={true}
         />
       </div>
     </section>
