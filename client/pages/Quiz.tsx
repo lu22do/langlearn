@@ -18,23 +18,25 @@ export default function Quiz() {
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
 
-  useEffect(() => {
-    async function fetchQuiz() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch('/api/quiz?size=5');
-        if (!res.ok) throw new Error((await res.json()).message || 'Failed to fetch quiz');
-        const data = await res.json();
-        setQuiz(data.quiz || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load quiz');
-      } finally {
-        setLoading(false);
-      }
+  const fetchQuiz = async () => {
+    setLoading(true);
+    setError(null);
+    setQuiz([]);
+    setIndex(0);
+    setSelected(null);
+    setScore(0);
+
+    try {
+      const res = await fetch('/api/quiz?size=5');
+      if (!res.ok) throw new Error((await res.json()).message || 'Failed to fetch quiz');
+      const data = await res.json();
+      setQuiz(data.quiz || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load quiz');
+    } finally {
+      setLoading(false);
     }
-    fetchQuiz();
-  }, []);
+  };
 
   const onSelect = (choiceIdx: number) => {
     if (selected !== null) return; // already answered
@@ -48,14 +50,28 @@ export default function Quiz() {
     setIndex((i) => i + 1);
   };
 
-  if (loading) return <section><h1>{t.quiz.title}</h1><p>Loading...</p></section>;
+  if (loading) return <section><h1>{t.quiz.title}</h1><p>{t.common.loading}</p></section>;
   if (error) return <section><h1>{t.quiz.title}</h1><p style={{ color: 'red' }}>{error}</p></section>;
-  if (!quiz || quiz.length === 0) return <section><h1>{t.quiz.title}</h1><p>{t.quiz.comingSoon}</p></section>;
+  if (!quiz || quiz.length === 0) {
+    return (
+      <section>
+        <h1>{t.quiz.title}</h1>
+        <p style={{ color: "#6b7280", marginBottom: 12 }}>{t.quiz.subtitle}</p>
+        <button onClick={fetchQuiz} style={{ padding: "8px 16px" }}>
+          Generate quiz
+        </button>
+      </section>
+    );
+  }
 
   if (index >= quiz.length) {
     return (
       <section>
         <h1>{t.quiz.title}</h1>
+        <p style={{ color: "#6b7280", marginBottom: 12 }}>{t.quiz.subtitle}</p>
+        <button onClick={fetchQuiz} style={{ padding: "8px 16px", marginBottom: 16 }}>
+          Generate quiz
+        </button>
         <p style={{ fontWeight: 600 }}>Your score: {score} / {quiz.length}</p>
       </section>
     );
@@ -67,6 +83,10 @@ export default function Quiz() {
     <section>
       <h1>{t.quiz.title}</h1>
       <p style={{ color: "#6b7280", marginBottom: 12 }}>{t.quiz.subtitle}</p>
+
+      <button onClick={fetchQuiz} style={{ padding: "8px 16px", marginBottom: 16 }}>
+        Generate quiz
+      </button>
 
       <div style={{ marginTop: 12, padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
         <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 8 }}>{cur.rawText}</div>
