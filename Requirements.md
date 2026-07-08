@@ -7,9 +7,9 @@ Help learners turn any text they encounter into something they can get back to l
 ## Core concepts & glossary
 
 - **Prompt box**: a text input area where learners paste any string, a prompt, to mine snippets.
-- **Snippet**: a token or phrase (single word or multi‑word expression) selected from the prompt and saved (along with the orginal prompt). A set of GenAI learning material is attached to snippet: examples (in learning language), explanation and grammar rules (in learning language) and  translation (base language, default English unless changed). A snippet has a state between "still learning" and "known" (archived). It also has a counter for how many times it has been seen by the user.
-- **Progressive disclosure**: help surfaces learning material in escalating order of “helpfulness” and dependency on the base language: examples → explanation → translation.
-- **Micro-lesson lane**: a scrollable stream where each item is treated as an individual micro‑lesson rather than part of a fixed deck for practicing snippets with quick interactions, hints, and short productions.
+- **Snippet**: a token or phrase (single word or multi‑word expression) selected from the prompt and saved (along with the orginal prompt saved as **context**). A set of GenAI learning material is attached to snippet: examples (in learning language), explanation and grammar rules (in learning language) and  translation (base language, default English unless changed). A snippet has a state between "still learning" and "known" (archived). It also has a counter for how many times it has been seen by the user.
+- **Progressive disclosure**: A review mode helps surface learning material in escalating order of “helpfulness” and dependency on the base language: examples → explanation → translation.
+- **Micro-lesson lane / quiz** [TBD]: a scrollable stream where each item is treated as an individual micro‑lesson rather than part of a fixed deck for practicing snippets with quick interactions, hints, and short productions.
 
 ## UX & UI requirements
 
@@ -35,6 +35,8 @@ Help learners turn any text they encounter into something they can get back to l
 ### User journeys (v2)
 
 - Snippets management: Search and grouping (collections).
+- Import large collection of text.
+- Edit snippet content.
 - Multiple users support, login/logout.
 - Settings for default translation language and hint policy.
 
@@ -42,17 +44,18 @@ Help learners turn any text they encounter into something they can get back to l
 
 ### Text ingestion & snippet creation
 
-- Paste or import text (min 1 char, max 20k chars per paste in MVP).
-- Tokenize text; allow user to select contiguous spans to form a snippet.
+- Paste text in prompt box (min 1 char, max 20k chars per paste in MVP).
+- Tokenize text: allow user to select contiguous spans to form a snippet.
 - Actions on snippet: 
   - generate learning material (one inference to generate all), progressively disclosed
-  - save (the snippet + learning material)
+  - save (the snippet + learning material + prompt as context)
 - Store snippet with: raw text, lemma, Part of Speech, language code, source context, user tags, created_at.
 - Support multi‑word expressions and inflected forms; link variants to a canonical lemma when available.
 
 ### Snippet review
 
-- Present due snippets in a micro-lesson lane based on scheduling.
+- Present snippets in a micro-lesson lane based on scheduling.
+- Filter snippets e.g. recent ones, ...
 - Per snippet, provide on‑demand actions for progressive disclosure:
   - `Get example(s)` (in learning language)
   - `Get explanation` (in learning language)
@@ -80,7 +83,7 @@ Help learners turn any text they encounter into something they can get back to l
 ### Quiz generation
 
 - Generate quizzes based on not-yet-acquired snippets.
-- Support different quiz formats (multiple-choice, fill-in-the-blank, typing, sentence completion).
+- Support different quiz formats (multiple-choice, fill-in-the-blank, typing, sentence completion, puzzle/crossword).
 - Allow users to set quiz length and difficulty.
 
 ### Settings
