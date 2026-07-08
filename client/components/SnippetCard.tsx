@@ -39,6 +39,17 @@ export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardPr
                 {'partOfSpeech' in snippet && snippet.partOfSpeech && <span style={{ marginLeft: 12 }}>{t.snippetCard.pos}: {snippet.partOfSpeech}</span>}
               </div>
 
+              {snippet.sourceContext && (
+                <div className="snippet-container">
+                  <strong className="snippet-header">{t.snippetCard.context}:</strong>{" "}
+                  <p style={{ margin: "4px 0", fontSize: 13, color: "#4b5563" }}>
+                  {snippet.sourceContext.length > 200
+                    ? snippet.sourceContext.substring(0, 200) + "..."
+                    : snippet.sourceContext}
+                  </p>
+                </div>
+              )}
+
               {/* AI-generated examples with hover tooltips */}
               {snippet.examples && snippet.examples.length > 0 && (
                 <div className="snippet-container">
@@ -131,24 +142,6 @@ export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardPr
                   </div>
                 </div>
               )}
-
-              {/* Source context */}
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#9ca3af",
-                  fontStyle: "italic",
-                  marginTop: 8,
-                  padding: 8,
-                  background: "#f9fafb",
-                  borderRadius: 4,
-                }}
-              >
-                <strong className="snippet-header">{t.snippetCard.context}:</strong>{" "}
-                {snippet.sourceContext.length > 200
-                  ? snippet.sourceContext.substring(0, 200) + "..."
-                  : snippet.sourceContext}
-              </div>
 
               {'createdAt' in snippet && snippet.createdAt && (
                 <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 8 }}>
