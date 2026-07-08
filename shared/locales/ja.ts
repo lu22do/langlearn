@@ -109,6 +109,7 @@ export const ja: TranslationKeys = {
     revealExamples: "例文を表示",
     revealTranslation: "翻訳を表示",
     nextSnippet: "次のスニペット",
+    previousSnippet: "前のスニペット",
     noContext: "文脈説明はありません。",
     noExamples: "例文はありません。",
     noTranslation: "翻訳はありません。",

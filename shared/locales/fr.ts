@@ -109,6 +109,7 @@ export const fr: TranslationKeys = {
     revealExamples: "Afficher les exemples",
     revealTranslation: "Afficher la traduction",
     nextSnippet: "Extrait suivant",
+    previousSnippet: "Extrait précédent",
     noContext: "Aucune explication contextuelle disponible.",
     noExamples: "Aucun exemple disponible.",
     noTranslation: "Aucune traduction disponible.",
