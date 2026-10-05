@@ -56,28 +56,50 @@ export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardPr
                   <strong className="snippet-header">{t.snippetCard.examples}:</strong>
                   <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13, listStyle: "none" }}>
                     {snippet.examples.map((ex, idx) => (
-                      <li 
+                      <li
                         key={idx} 
                         style={{ 
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
+                          gap: 6,
                           marginBottom: 4,
-                          cursor: "pointer",
                           padding: "6px 8px",
                           borderRadius: 4,
                           position: "relative"
                         }}
-                        onMouseEnter={() => setHoveredExample(idx)}
-                        onMouseLeave={() => setHoveredExample(null)}
                       >
                         <div style={{ color: "#1f2937", fontWeight: 500 }}>
                           {ex.example}
                         </div>
-                        {hoveredExample === idx && (
-                          <div style={{ 
+                        <div
+                          style={{ flexShrink: 0 }}
+                          onMouseLeave={() => setHoveredExample(null)}
+                        >
+                          <button
+                            type="button"
+                            aria-label={t.snippetCard.hoverToReveal}
+                            aria-expanded={hoveredExample === idx}
+                            onMouseEnter={() => setHoveredExample(idx)}
+                            onFocus={() => setHoveredExample(idx)}
+                            onBlur={() => setHoveredExample(null)}
+                            style={{
+                              border: 0,
+                              background: "transparent",
+                              padding: 4,
+                              cursor: "pointer",
+                              fontSize: 16,
+                              lineHeight: 1
+                            }}
+                          >
+                            💡
+                          </button>
+                          {hoveredExample === idx && (
+                            <div style={{ 
                             position: "absolute",
-                            bottom: "80%",
-                            left: "20%",
-                            transform: "translateX(-50%)",
-                            marginBottom: 8,
+                            left: 0,
+                            right: 0,
+                            bottom: "calc(100% + 4px)",
                             padding: "8px 12px",
                             background: "#1f2937",
                             color: "#fff",
@@ -85,12 +107,14 @@ export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardPr
                             borderRadius: 6,
                             boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
                             zIndex: 10,
-                            maxWidth: "400px",
+                            boxSizing: "border-box",
+                            maxWidth: "calc(100vw - 32px)",
                             whiteSpace: "normal"
                           }}>
                             {ex.translation}
                           </div>
-                        )}
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>
