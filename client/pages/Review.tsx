@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { ISnippet } from "../../server/models/Snippet.js";
+import Example from "../components/Example";
 import { useLocalization } from "../contexts/LocalizationContext";
 
 type SnippetType = Omit<ISnippet, keyof Document> & { _id?: string };
@@ -141,12 +142,14 @@ export default function Review() {
         );
       case "examples":
         return currentSnippet.examples && currentSnippet.examples.length > 0 ? (
-          <ul style={{ margin: 0, paddingLeft: 20, color: "#374151", lineHeight: 1.6 }}>
+          <ul style={{ margin: 0, color: "#374151", lineHeight: 1.6 }}>
             {currentSnippet.examples.map((example, index) => (
-              <li key={`${example.example}-${index}`} style={{ marginBottom: 10 }}>
-                <div><strong>{example.example}</strong></div>
-                <div style={{ color: "#6b7280" }}>{example.translation}</div>
-              </li>
+              <Example
+                key={`${example.example}-${index}`}
+                text={example.example}
+                translation={example.translation}
+                revealLabel={t.snippetCard.hoverToReveal}
+              />
             ))}
           </ul>
         ) : (

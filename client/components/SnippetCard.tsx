@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Globe } from "lucide-react";
 import type { ISnippet, SnippetAnalysis } from "../../server/models/Snippet.js";
+import Example from "./Example";
 import { useLocalization } from "../contexts/LocalizationContext";
 
 type Snippet = Omit<ISnippet, keyof Document> & { _id?: string };
@@ -15,8 +15,6 @@ interface SnippetCardProps {
 
 export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardProps) {
   const { t } = useLocalization();
-  const [hoveredExample, setHoveredExample] = useState<number | null>(null);
-  const [activeExample, setActiveExample] = useState<number | null>(null);
   const [hoveredTranslation, setHoveredTranslation] = useState(false);
 
   return (
@@ -52,83 +50,18 @@ export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardPr
                 </div>
               )}
 
-              {/* AI-generated examples with hover tooltips */}
+                  {/* AI-generated examples with hover translations */}
               {snippet.examples && snippet.examples.length > 0 && (
                 <div className="snippet-container">
                   <strong className="snippet-header">{t.snippetCard.examples}:</strong>
                   <ul style={{ margin: "4px 0", paddingLeft: 20, fontSize: 13, listStyle: "none" }}>
                     {snippet.examples.map((ex, idx) => (
-                      <li
-                        key={idx} 
-                        style={{ 
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "flex-start",
-                          gap: 6,
-                          marginBottom: 4,
-                          padding: "6px 8px",
-                          borderRadius: 4,
-                          position: "relative"
-                        }}
-                        onMouseEnter={() => setActiveExample(idx)}
-                        onMouseLeave={() => setActiveExample(null)}
-                      >
-                        <div style={{ color: "#1f2937", fontWeight: 500 }}>
-                          {ex.example}
-                        </div>
-                        <div
-                          style={{ flexShrink: 0 }}
-                          onMouseLeave={() => setHoveredExample(null)}
-                        >
-                          <button
-                            type="button"
-                            aria-label={t.snippetCard.hoverToReveal}
-                            aria-expanded={hoveredExample === idx}
-                            onMouseEnter={() => setHoveredExample(idx)}
-                            onFocus={() => {
-                              setActiveExample(idx);
-                              setHoveredExample(idx);
-                            }}
-                            onBlur={() => {
-                              setActiveExample(null);
-                              setHoveredExample(null);
-                            }}
-                            style={{
-                              border: 0,
-                              background: "transparent",
-                              padding: 2,
-                              cursor: "pointer",
-                              color: "#4b5563",
-                              display: "flex",
-                              alignItems: "center",
-                              opacity: activeExample === idx ? 1 : 0,
-                              transition: "opacity 0.15s"
-                            }}
-                          >
-                            <Globe size={12} aria-hidden="true" />
-                          </button>
-                          {hoveredExample === idx && (
-                            <div style={{ 
-                            position: "absolute",
-                            left: 0,
-                            right: 0,
-                            bottom: "calc(100% + 4px)",
-                            padding: "8px 12px",
-                            background: "#1f2937",
-                            color: "#fff",
-                            fontSize: 12,
-                            borderRadius: 6,
-                            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                            zIndex: 10,
-                            boxSizing: "border-box",
-                            maxWidth: "calc(100vw - 32px)",
-                            whiteSpace: "normal"
-                          }}>
-                            {ex.translation}
-                          </div>
-                          )}
-                        </div>
-                      </li>
+                      <Example
+                        key={idx}
+                        text={ex.example}
+                        translation={ex.translation}
+                        revealLabel={t.snippetCard.hoverToReveal}
+                      />
                     ))}
                   </ul>
                 </div>
