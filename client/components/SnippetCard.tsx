@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Globe } from "lucide-react";
 import type { ISnippet, SnippetAnalysis } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
 
@@ -15,6 +16,7 @@ interface SnippetCardProps {
 export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardProps) {
   const { t } = useLocalization();
   const [hoveredExample, setHoveredExample] = useState<number | null>(null);
+  const [activeExample, setActiveExample] = useState<number | null>(null);
   const [hoveredTranslation, setHoveredTranslation] = useState(false);
 
   return (
@@ -68,6 +70,8 @@ export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardPr
                           borderRadius: 4,
                           position: "relative"
                         }}
+                        onMouseEnter={() => setActiveExample(idx)}
+                        onMouseLeave={() => setActiveExample(null)}
                       >
                         <div style={{ color: "#1f2937", fontWeight: 500 }}>
                           {ex.example}
@@ -81,18 +85,27 @@ export default function SnippetCard({ snippet, onDelete, saving }: SnippetCardPr
                             aria-label={t.snippetCard.hoverToReveal}
                             aria-expanded={hoveredExample === idx}
                             onMouseEnter={() => setHoveredExample(idx)}
-                            onFocus={() => setHoveredExample(idx)}
-                            onBlur={() => setHoveredExample(null)}
+                            onFocus={() => {
+                              setActiveExample(idx);
+                              setHoveredExample(idx);
+                            }}
+                            onBlur={() => {
+                              setActiveExample(null);
+                              setHoveredExample(null);
+                            }}
                             style={{
                               border: 0,
                               background: "transparent",
-                              padding: 4,
+                              padding: 2,
                               cursor: "pointer",
-                              fontSize: 16,
-                              lineHeight: 1
+                              color: "#4b5563",
+                              display: "flex",
+                              alignItems: "center",
+                              opacity: activeExample === idx ? 1 : 0,
+                              transition: "opacity 0.15s"
                             }}
                           >
-                            💡
+                            <Globe size={12} aria-hidden="true" />
                           </button>
                           {hoveredExample === idx && (
                             <div style={{ 
