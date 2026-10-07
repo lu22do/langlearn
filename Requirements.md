@@ -2,7 +2,9 @@
 
 ## Product vision
 
-Help learners turn any text they encounter into something they can get back to later in the form of personalized micro‑lessons. The app adapts to each learner’s pace and preferences via a new style of “flash card” that offer progressive disclosure of meaning (examples → explanation → translation) when the user does not remember or wants to deep dive in the details. The app offers a way for the user to indicate if they have acquired the content of the snippet. There is also some ways on user asks to generate quizzes based on all the snippets that are not yet acquired. In general, the app prioritizes using the target language (including for the UI) rather than using the base language (although there could be quick way to translate when needed).
+Help language learners turn very easily any text they encounter into a rich explanation that they can get back to later. The text is called a snippet and can be a single word, a piece of text (e.g. a sentence) or a word in a piece of text. The way to get back to content previously encountered can be done by browsing or in the form of personalized micro‑lessons. 
+
+Overall, the app adapts to each learner’s pace and preferences via a new style of “flash card” that offer progressive disclosure of meaning (examples → explanations & examples → translation) when the user does not remember or wants to deep dive in the details. The app offers a way for the user to indicate if they have acquired the content of the snippet. There is also some ways on user asks to generate quizzes based on all the snippets that are not yet acquired. In general, the app prioritizes using the target language (including for the UI) rather than using the base language (although a quick way to translate when needed would be offered).
 
 ## Core concepts & glossary
 
