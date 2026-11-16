@@ -7,7 +7,7 @@ export const en = {
     quiz: "Quiz",
     settings: "Settings",
   },
-  
+
   // Common
   common: {
     loading: "Loading...",
@@ -24,12 +24,12 @@ export const en = {
     deleting: "Deleting...",
     created: "Created",
   },
-  
+
   // Home page
   home: {
     title: "Add Snippets",
     subtitle: "Paste text below, select words or phrases to create snippets for learning.",
-    placeholder: "Paste your text here (max 20,000 characters)...",
+    placeholder: "Paste your text here (max few sentences)...",
     characters: "characters",
     selected: "Selected",
     createSnippet: "Create Snippet",
@@ -43,10 +43,10 @@ export const en = {
     failedToAnalyze: "Failed to analyze snippet",
     failedToSave: "Failed to save snippet",
   },
-  
+
   // Snippet List page
   snippetList: {
-    title: "Snippets",
+    snippet: "Snippet",
     subtitle: "Browse and manage your saved language snippets. Click on a card to view details.",
     savedSnippets: "Saved Snippets",
     noSnippets: "No snippets saved yet. Create some!",
@@ -54,7 +54,7 @@ export const en = {
     failedToLoad: "Failed to load snippets",
     failedToDelete: "Failed to delete snippet",
   },
-  
+
   // Snippet detail page
   snippet: {
     title: "Snippet Details",
@@ -64,20 +64,21 @@ export const en = {
     failedToLoad: "Failed to load snippet",
     failedToDelete: "Failed to delete snippet",
   },
-  
+
   // Snippet Card
   snippetCard: {
     language: "Language",
     lemma: "Lemma",
     pos: "POS",
     examples: "Examples",
+    contextOrExample: "Context or example",
     contextualExplanation: "Contextual Explanation",
     grammarUsage: "Grammar & Usage",
     translation: "Translation",
     hoverToReveal: "Hover to reveal",
     context: "Context",
   },
-  
+
   // Settings page
   settings: {
     title: "Settings",
@@ -98,7 +99,7 @@ export const en = {
     failedToLoad: "Failed to load settings",
     failedToSave: "Failed to save settings",
   },
-  
+
   // Learn page
   learn: {
     title: "Review",
@@ -121,7 +122,7 @@ export const en = {
     noTranslation: "No translation available.",
     noSnippets: "No snippets are available for review yet.",
   },
-  
+
   // Quiz page
   quiz: {
     title: "Quiz",

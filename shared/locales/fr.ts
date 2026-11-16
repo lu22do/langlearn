@@ -8,7 +8,7 @@ export const fr: TranslationKeys = {
     quiz: "Quiz",
     settings: "Paramètres",
   },
-  
+
   common: {
     loading: "Chargement...",
     save: "Enregistrer",
@@ -24,11 +24,11 @@ export const fr: TranslationKeys = {
     deleting: "Suppression...",
     created: "Créé",
   },
-  
+
   home: {
     title: "Ajouter des extraits",
     subtitle: "Collez le texte ci-dessous, sélectionnez des mots ou des phrases pour créer des extraits d'apprentissage.",
-    placeholder: "Collez votre texte ici (max 20 000 caractères)...",
+    placeholder: "Collez votre texte ici (max. quelques phrases)...",
     characters: "caractères",
     selected: "Sélectionné",
     createSnippet: "Créer un extrait",
@@ -42,9 +42,9 @@ export const fr: TranslationKeys = {
     failedToAnalyze: "Échec de l'analyse de l'extrait",
     failedToSave: "Échec de l'enregistrement de l'extrait",
   },
-  
+
   snippetList: {
-    title: "Extraits",
+    snippet: "Extrait",
     subtitle: "Parcourez et gérez vos extraits de langue enregistrés. Cliquez sur une carte pour voir les détails.",
     savedSnippets: "Extraits enregistrés",
     noSnippets: "Aucun extrait enregistré pour le moment. Créez-en!",
@@ -52,7 +52,7 @@ export const fr: TranslationKeys = {
     failedToLoad: "Échec du chargement des extraits",
     failedToDelete: "Échec de la suppression de l'extrait",
   },
-  
+
   snippet: {
     title: "Détails de l'extrait",
     backToSnippets: "Retour aux extraits",
@@ -61,19 +61,20 @@ export const fr: TranslationKeys = {
     failedToLoad: "Échec du chargement de l'extrait",
     failedToDelete: "Échec de la suppression de l'extrait",
   },
-  
+
   snippetCard: {
     language: "Langue",
     lemma: "Lemme",
     pos: "Catégorie grammaticale",
     examples: "Exemples",
+    contextOrExample: "Contexte ou exemple",
     contextualExplanation: "Explication contextuelle",
     grammarUsage: "Grammaire et utilisation",
     translation: "Traduction",
     hoverToReveal: "Survolez pour révéler",
     context: "Contexte",
   },
-  
+
   settings: {
     title: "Paramètres",
     subtitle: "Configurez vos préférences linguistiques et paramètres d'apprentissage.",
@@ -93,7 +94,7 @@ export const fr: TranslationKeys = {
     failedToLoad: "Échec du chargement des paramètres",
     failedToSave: "Échec de l'enregistrement des paramètres",
   },
-  
+
   learn: {
     title: "Révision",
     subtitle: "Révisez vos extraits enregistrés et pratiquez.",
@@ -115,7 +116,7 @@ export const fr: TranslationKeys = {
     noTranslation: "Aucune traduction disponible.",
     noSnippets: "Aucun extrait n'est encore disponible pour la révision.",
   },
-  
+
   quiz: {
     title: "Quiz",
     subtitle: "Testez vos connaissances avec des quiz interactifs.",

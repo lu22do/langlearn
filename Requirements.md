@@ -2,15 +2,17 @@
 
 ## Product vision
 
-Help language learners turn very easily any text they encounter into a rich explanation that they can get back to later. The text is called a snippet and can be a single word, a piece of text (e.g. a sentence) or a word in a piece of text. The way to get back to content previously encountered can be done by browsing or in the form of personalized micro‑lessons. 
+Help language learners turn very easily any text they encounter into a rich explanation that they can get back to later. The text is called a snippet and can be a one or more words, possibly selected in a piece of text (which becomes its context). The way to get back to content previously encountered can be done by browsing snippets, reviewing them or getting quizzes.
 
-Overall, the app adapts to each learner’s pace and preferences via a new style of “flash card” that offer progressive disclosure of meaning (examples → explanations & examples → translation) when the user does not remember or wants to deep dive in the details. The app offers a way for the user to indicate if they have acquired the content of the snippet. There is also some ways on user asks to generate quizzes based on all the snippets that are not yet acquired. In general, the app prioritizes using the target language (including for the UI) rather than using the base language (although a quick way to translate when needed would be offered).
+For reviews, the app offers a new style of “flash card” that offer progressive disclosure of meaning (snippet -> examples -> explanations -> translation) and offers a way for the user to indicate if they have acquired the content of the snippet.
+
+There is also some ways on user asks to generate quizzes based on all the snippets that are not yet acquired. In general, the app prioritizes using the target language (including for the UI) rather than using the base language (although a quick way to translate when needed would be offered).
 
 ## Core concepts & glossary
 
-- **Prompt box**: a text input area where learners paste any string, a prompt, to mine snippets.
-- **Snippet**: a token or phrase (single word or multi‑word expression) selected from the prompt and saved (along with the orginal prompt saved as **context**). A set of GenAI learning material is attached to snippet: examples (in learning language), explanation and grammar rules (in learning language) and  translation (base language, default English unless changed). A snippet has a state between "still learning" and "known" (archived). It also has a counter for how many times it has been seen by the user.
-- **Progressive disclosure**: A review mode helps surface learning material in escalating order of “helpfulness” and dependency on the base language: examples → explanation → translation.
+- **Prompt box**: a text input area where learners paste any string, a prompt, to extract snippets from.
+- **Snippet**: a token or phrase (single word or multi‑word expression) selected from the prompt and saved (along with the orginal prompt saved as **context**). A set of GenAI learning material is attached to snippet: examples (in learning language), explanation and grammar rules (in learning language) and  translation (base language, default English unless changed). A snippet has a state between "new", "still learning" and "known" (archived). It also has a counter for how many times it has been seen by the user.
+- **Progressive disclosure**: A review mode helps surface learning material in escalating order of “helpfulness” and dependency on the base language: snippet -> examples → explanation → translation.
 - **Micro-lesson lane / quiz** [TBD]: a scrollable stream where each item is treated as an individual micro‑lesson rather than part of a fixed deck for practicing snippets with quick interactions, hints, and short productions.
 
 ## UX & UI requirements
@@ -19,7 +21,7 @@ Overall, the app adapts to each learner’s pace and preferences via a new style
 
 - **Home page**: prompt box for snippet selection & creation.
 - **Snippets page**: manage snippets.
-- **Review page**: snippets displayed one by one, with progressive disclosure chips and response inputs (known / still learning).
+- **Review page**: snippets displayed one by one, like flash cards, with progressive disclosure chips and response inputs (known / still learning).
 - **Quiz page**: GenAI quiz based on "still learning" snippets.
 - **Settings page**: manage settings.
 

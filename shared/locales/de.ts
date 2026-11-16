@@ -8,7 +8,7 @@ export const de: TranslationKeys = {
     quiz: "Quiz",
     settings: "Einstellungen",
   },
-  
+
   common: {
     loading: "Lädt...",
     save: "Speichern",
@@ -24,11 +24,11 @@ export const de: TranslationKeys = {
     deleting: "Löscht...",
     created: "Erstellt",
   },
-  
+
   home: {
     title: "Schnipsel hinzufügen",
     subtitle: "Fügen Sie unten Text ein und wählen Sie Wörter oder Phrasen aus, um Schnipsel zum Lernen zu erstellen.",
-    placeholder: "Fügen Sie Ihren Text hier ein (max. 20.000 Zeichen)...",
+    placeholder: "Fügen Sie Ihren Text hier ein (max. wenige Sätze)...",
     characters: "Zeichen",
     selected: "Ausgewählt",
     createSnippet: "Schnipsel erstellen",
@@ -42,9 +42,9 @@ export const de: TranslationKeys = {
     failedToAnalyze: "Analyse des Schnipsels fehlgeschlagen",
     failedToSave: "Speichern des Schnipsels fehlgeschlagen",
   },
-  
+
   snippetList: {
-    title: "Schnipsel",
+    snippet: "Schnipsel",
     subtitle: "Durchsuchen und verwalten Sie Ihre gespeicherten Sprachschnipsel. Klicken Sie auf eine Karte, um Details anzuzeigen.",
     savedSnippets: "Gespeicherte Schnipsel",
     noSnippets: "Noch keine Schnipsel gespeichert. Erstellen Sie welche!",
@@ -52,7 +52,7 @@ export const de: TranslationKeys = {
     failedToLoad: "Laden der Schnipsel fehlgeschlagen",
     failedToDelete: "Löschen des Schnipsels fehlgeschlagen",
   },
-  
+
   snippet: {
     title: "Schnipsel-Details",
     backToSnippets: "Zurück zu Schnipseln",
@@ -61,19 +61,20 @@ export const de: TranslationKeys = {
     failedToLoad: "Laden des Schnipsels fehlgeschlagen",
     failedToDelete: "Löschen des Schnipsels fehlgeschlagen",
   },
-  
+
   snippetCard: {
     language: "Sprache",
     lemma: "Lemma",
     pos: "Wortart",
     examples: "Beispiele",
+    contextOrExample: "Kontext oder Beispiel",
     contextualExplanation: "Kontextuelle Erklärung",
     grammarUsage: "Grammatik & Verwendung",
     translation: "Übersetzung",
     hoverToReveal: "Bewegen Sie die Maus, um aufzudecken",
     context: "Kontext",
   },
-  
+
   settings: {
     title: "Einstellungen",
     subtitle: "Konfigurieren Sie Ihre Sprachpräferenzen und Lerneinstellungen.",
@@ -93,7 +94,7 @@ export const de: TranslationKeys = {
     failedToLoad: "Laden der Einstellungen fehlgeschlagen",
     failedToSave: "Speichern der Einstellungen fehlgeschlagen",
   },
-  
+
   learn: {
     title: "Wiederholung",
     subtitle: "Überprüfen Sie Ihre gespeicherten Schnipsel und üben Sie.",
@@ -115,7 +116,7 @@ export const de: TranslationKeys = {
     noTranslation: "Keine Übersetzung verfügbar.",
     noSnippets: "Noch keine Schnipsel für die Wiederholung verfügbar.",
   },
-  
+
   quiz: {
     title: "Quiz",
     subtitle: "Testen Sie Ihr Wissen mit interaktiven Quiz.",

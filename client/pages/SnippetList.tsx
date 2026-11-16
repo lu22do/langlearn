@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import type { ISnippet } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
 
-type Snippet = Omit<ISnippet, keyof Document> & { _id?: string }; 
+type Snippet = Omit<ISnippet, keyof Document> & { _id?: string };
 
 export default function SnippetList() {
   const { t } = useLocalization();
@@ -36,7 +36,7 @@ export default function SnippetList() {
 
   const deleteSnippet = async (id?: string) => {
     if (!id) return;
-    
+
     setSaving(true);
     setError(null);
     try {
@@ -103,8 +103,8 @@ export default function SnippetList() {
             <table style={{ width: "100%", minWidth: 1200, borderCollapse: "collapse", background: "#fff" }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #e5e7eb", textAlign: "left" }}>
-                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280" }}>{t.snippetList.title}</th>
-                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280", width: "90%" }}>{t.snippetCard.examples}</th>
+                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280" }}>{t.snippetList.snippet}</th>
+                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280", width: "90%" }}>{t.snippetCard.contextOrExample}</th>
                   <th style={{ padding: "12px 10px", width: 80 }}></th>
                 </tr>
               </thead>
