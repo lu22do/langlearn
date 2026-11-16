@@ -12,8 +12,6 @@ app.use(express.urlencoded({ extended: true }));
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/myViteAppDB";
 const PORT = Number(process.env.PORT) || 3000;
 
-console.log("Using MongoDB URI:", MONGODB_URI);
-
 mongoose.connect(MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
