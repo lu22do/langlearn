@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { LANGUAGES } from "../../shared/constants/languages";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { apiFetch } from "../lib/api";
 
 interface SettingsData {
   _id?: string;
@@ -29,7 +30,7 @@ export default function Settings() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/settings");
+      const res = await apiFetch("/api/settings");
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       setSettings(data);
@@ -46,7 +47,7 @@ export default function Settings() {
     setSuccess(null);
 
     try {
-      const res = await fetch("/api/settings", {
+      const res = await apiFetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import type { ISnippet } from "../../server/models/Snippet.js";
 import Example from "../components/Example";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { apiFetch } from "../lib/api";
 
 type SnippetType = Omit<ISnippet, keyof Document> & { _id?: string };
 type ReviewPhase = "empty" | "context" | "examples" | "translation";
@@ -56,7 +57,7 @@ export default function Review() {
       setError(null);
 
       try {
-        const response = await fetch("/api/snippets");
+        const response = await apiFetch("/api/snippets");
         if (!response.ok) {
           throw new Error("Failed to load snippets");
         }

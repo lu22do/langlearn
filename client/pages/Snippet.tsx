@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { ISnippet } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { apiFetch } from "../lib/api";
 import SnippetCard from "../components/SnippetCard";
 
 type SnippetType = Omit<ISnippet, keyof Document> & { _id?: string };
@@ -25,7 +26,7 @@ export default function Snippet() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/snippets/${snippetId}`);
+      const res = await apiFetch(`/api/snippets/${snippetId}`);
       if (!res.ok) {
         if (res.status === 404) {
           throw new Error(t.snippet.notFound);
@@ -51,7 +52,7 @@ export default function Snippet() {
     setDeleting(true);
     setError(null);
     try {
-      const res = await fetch(`/api/snippets/${snippetId}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/snippets/${snippetId}`, { method: "DELETE" });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       // Navigate back to snippets list after successful deletion
       navigate("/snippets");

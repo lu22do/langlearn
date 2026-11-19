@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { apiFetch } from "../lib/api";
 
 type QuizQuestion = {
   rawText: string;
@@ -27,7 +28,7 @@ export default function Quiz() {
     setScore(0);
 
     try {
-      const res = await fetch('/api/quiz?size=5');
+      const res = await apiFetch('/api/quiz?size=5');
       if (!res.ok) throw new Error((await res.json()).message || 'Failed to fetch quiz');
       const data = await res.json();
       setQuiz(data.quiz || []);

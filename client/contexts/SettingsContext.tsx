@@ -1,5 +1,7 @@
 // Custom hook for settings
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { useAuth } from "./AuthContext";
+import { apiFetch } from "../lib/api";
 
 interface Settings {
   baseLanguageCode: string;
@@ -24,6 +26,7 @@ export const useSettings = () => {
 };
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [settings, setSettings] = useState<Settings>({
     baseLanguageCode: "en",
     UILanguageCode: "en",
@@ -31,10 +34,14 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await fetch("/api/settings");
+      const res = await apiFetch("/api/settings");
       if (res.ok) {
         const data = await res.json();
         setSettings(data);
@@ -44,11 +51,11 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchSettings();
-  }, []);
+  }, [fetchSettings]);
 
   return (
     <SettingsContext.Provider value={{ settings, loading, refreshSettings: fetchSettings }}>

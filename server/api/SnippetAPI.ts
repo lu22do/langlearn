@@ -1,13 +1,14 @@
 import { Express } from "express";
 import Snippet from "../models/Snippet.js";
 import { analyzeSnippet, generateQuiz } from "../ai.js";
+import { requireAuth } from "../middleware/auth.js";
 
 export function registerSnippetRoutes(app: Express) {
   // Get all snippets with optional filtering by languageCode and tag
-  app.get("/api/snippets", async (req, res) => {
+  app.get("/api/snippets", requireAuth, async (req, res) => {
     try {
       const { languageCode, tag } = req.query;
-      const filter: any = {};
+      const filter: any = { userId: req.userId };
       if (languageCode) filter.languageCode = languageCode;
       if (tag) filter.tags = tag;
       
@@ -20,7 +21,7 @@ export function registerSnippetRoutes(app: Express) {
   });
 
   // Analyze snippet with AI
-  app.post("/api/snippets/analyze", async (req, res) => {
+  app.post("/api/snippets/analyze", requireAuth, async (req, res) => {
     try {
       const { text, context, learning_language, base_language, ui_language } = req.body;
       
@@ -39,13 +40,14 @@ export function registerSnippetRoutes(app: Express) {
   });
 
   // Generate a quiz from random snippets
-  app.get('/api/quiz', async (req, res) => {
+  app.get('/api/quiz', requireAuth, async (req, res) => {
     try {
       const size = parseInt((req.query.size as string) || '5', 10);
       const ui_language = (req.query.ui_language as string) || 'en';
 
-      // sample random snippets
+      // sample random snippets for the authenticated user
       const snippets = await Snippet.aggregate([
+        { $match: { userId: req.userId } },
         { $sample: { size } },
         { $project: { rawText: 1, languageCode: 1, sourceContext: 1, _id: 0 } }
       ]);
@@ -63,7 +65,7 @@ export function registerSnippetRoutes(app: Express) {
   });
 
   // Store new snippet
-  app.post('/api/snippets', async (req, res) => {
+  app.post('/api/snippets', requireAuth, async (req, res) => {
     //console.log("POST /api/snippets called with body:", req.body);
     
     const { 
@@ -77,7 +79,6 @@ export function registerSnippetRoutes(app: Express) {
       examples,
       explanations,
       translation,
-      userId,
       difficulty,
       nextReview,
       reviewCount
@@ -102,7 +103,7 @@ export function registerSnippetRoutes(app: Express) {
       examples,
       explanations,
       translation,
-      userId,
+      userId: req.userId,
       difficulty,
       nextReview,
       reviewCount
@@ -118,10 +119,10 @@ export function registerSnippetRoutes(app: Express) {
   });
 
   // Get single snippet by id
-  app.get('/api/snippets/:id', async (req, res) => {
+  app.get('/api/snippets/:id', requireAuth, async (req, res) => {
     const id = req.params.id;
     try {
-      const snippet = await Snippet.findById(id);
+      const snippet = await Snippet.findOne({ _id: id, userId: req.userId });
       if (!snippet) {
         return res.status(404).json({ message: "Snippet not found" });
       }
@@ -133,7 +134,7 @@ export function registerSnippetRoutes(app: Express) {
   });
 
   // Update snippet by id
-  app.put('/api/snippets/:id', async (req, res) => {
+  app.put('/api/snippets/:id', requireAuth, async (req, res) => {
     const id = req.params.id;
     const { 
       rawText, 
@@ -165,7 +166,11 @@ export function registerSnippetRoutes(app: Express) {
     if (reviewCount !== undefined) update.reviewCount = reviewCount;
 
     try {
-      const updated = await Snippet.findByIdAndUpdate(id, update, { new: true, runValidators: true });
+      const updated = await Snippet.findOneAndUpdate(
+        { _id: id, userId: req.userId },
+        update,
+        { new: true, runValidators: true }
+      );
       if (!updated) {
         return res.status(404).json({ message: "Snippet not found" });
       }
@@ -177,10 +182,10 @@ export function registerSnippetRoutes(app: Express) {
   });
 
   // Delete snippet by id
-  app.delete('/api/snippets/:id', async (req, res) => {
+  app.delete('/api/snippets/:id', requireAuth, async (req, res) => {
     const id = req.params.id;
     try {
-      const deleted = await Snippet.findByIdAndDelete(id);
+      const deleted = await Snippet.findOneAndDelete({ _id: id, userId: req.userId });
       if (!deleted) {
         return res.status(404).json({ message: "Snippet not found" });
       }

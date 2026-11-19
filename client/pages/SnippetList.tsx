@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ISnippet } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { apiFetch } from "../lib/api";
 
 type Snippet = Omit<ISnippet, keyof Document> & { _id?: string };
 
@@ -23,7 +24,7 @@ export default function SnippetList() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/snippets");
+      const res = await apiFetch("/api/snippets");
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       setSavedSnippets(Array.isArray(data) ? data : []);
@@ -40,7 +41,7 @@ export default function SnippetList() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/api/snippets/${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/snippets/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       setSuccess(t.snippetList.snippetDeleted);
       setTimeout(() => setSuccess(null), 3000);

@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import type { SnippetAnalysis, ISnippet } from "../../server/models/Snippet.js";
 import { useSettings } from "../contexts/SettingsContext";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { apiFetch } from "../lib/api";
 import SnippetCard from "../components/SnippetCard";
 
 type Snippet = Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & { _id?: string }; 
@@ -61,7 +62,7 @@ export default function Home() {
     setError(null);
 
     try {
-      const res = await fetch("/api/snippets/analyze", {
+      const res = await apiFetch("/api/snippets/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -104,7 +105,7 @@ export default function Home() {
     setError(null);
 
     try {
-      const res = await fetch("/api/snippets", {
+      const res = await apiFetch("/api/snippets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(snippet),

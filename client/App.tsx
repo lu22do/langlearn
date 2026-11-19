@@ -3,6 +3,7 @@ import "./css/index.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { LocalizationProvider } from "./contexts/LocalizationContext";
 import { useLocalization } from "./contexts/LocalizationContext";
@@ -15,31 +16,101 @@ import Settings from "./pages/Settings";
 
 function AppContent() {
   const { t } = useLocalization();
+  const { user, loading: authLoading, error: authError, isConfigured, signInWithGoogle, signOut } = useAuth();
+
+  if (authLoading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+        <p>{t.common.loading}</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          padding: 24,
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: 420, width: "100%" }}>
+          <h1>LangLearn</h1>
+          <p style={{ marginBottom: 24 }}>
+            Sign in with your Google account to save snippets and track your learning progress.
+          </p>
+          {!isConfigured ? (
+            <p style={{ color: "red" }}>
+              Firebase is not configured. Set <code>VITE_FIREBASE_API_KEY</code>,{" "}
+              <code>VITE_FIREBASE_AUTH_DOMAIN</code>, and{" "}
+              <code>VITE_FIREBASE_PROJECT_ID</code> in your <code>.env</code> file.
+            </p>
+          ) : (
+            <button onClick={signInWithGoogle} style={{ width: "100%" }}>
+              Sign in with Google
+            </button>
+          )}
+          {authError && (
+            <p style={{ color: "red", marginTop: 16 }}>{authError}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
   
   // Sidebar component (local)
   const Sidebar: React.FC = () => {
     const activeClass = ({ isActive }: { isActive: boolean }) =>
       "nav-link" + (isActive ? " active" : "");
     return (
-      <aside style={{ width: 220, padding: 16, borderRight: "1px solid #eee" }}>
-        <div style={{ fontWeight: 700, marginBottom: 12 }}>LangLearn</div>
-        <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <NavLink to="/" className={activeClass} end>
-            {t.nav.home}
-          </NavLink>
-          <NavLink to="/snippets" className={activeClass}>
-            {t.nav.snippets}
-          </NavLink>
-          <NavLink to="/review" className={activeClass}>
-            {t.nav.learn}
-          </NavLink>
-          <NavLink to="/quiz" className={activeClass}>
-            {t.nav.quiz}
-          </NavLink>
-          <NavLink to="/settings" className={activeClass}>
-            {t.nav.settings}
-          </NavLink>
-        </nav>
+      <aside
+        style={{
+          width: 220,
+          padding: 16,
+          borderRight: "1px solid #eee",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>
+          <div style={{ fontWeight: 700, marginBottom: 12 }}>LangLearn</div>
+          <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <NavLink to="/" className={activeClass} end>
+              {t.nav.home}
+            </NavLink>
+            <NavLink to="/snippets" className={activeClass}>
+              {t.nav.snippets}
+            </NavLink>
+            <NavLink to="/review" className={activeClass}>
+              {t.nav.learn}
+            </NavLink>
+            <NavLink to="/quiz" className={activeClass}>
+              {t.nav.quiz}
+            </NavLink>
+            <NavLink to="/settings" className={activeClass}>
+              {t.nav.settings}
+            </NavLink>
+          </nav>
+        </div>
+
+        <div style={{ borderTop: "1px solid #eee", paddingTop: 12, marginTop: 16 }}>
+          <div style={{ fontSize: "0.85em", marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis" }}>
+            {user.displayName || user.email}
+          </div>
+          <button
+            onClick={signOut}
+            className="secondary outline"
+            style={{ width: "100%", padding: "6px 12px", fontSize: "0.85em" }}
+          >
+            Sign out
+          </button>
+        </div>
       </aside>
     );
   };
@@ -66,11 +137,13 @@ function AppContent() {
 
 function App() {
   return (
-    <SettingsProvider>
-      <LocalizationProvider>
-        <AppContent />
-      </LocalizationProvider>
-    </SettingsProvider>
+    <AuthProvider>
+      <SettingsProvider>
+        <LocalizationProvider>
+          <AppContent />
+        </LocalizationProvider>
+      </SettingsProvider>
+    </AuthProvider>
   );
 }
 
