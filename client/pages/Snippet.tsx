@@ -96,12 +96,12 @@ export default function Snippet() {
 
   return (
     <section>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+      <div className="snippet-detail-header">
         <button onClick={handleClose} style={{ padding: "8px 16px", fontSize: 14 }}>
           ← {t.snippet.backToSnippets}
         </button>
         <h1 style={{ margin: 0, flex: 1, textAlign: "center" }}>{t.snippet.title}</h1>
-        <div style={{ width: 120 }} /> {/* Spacer for centering */}
+        <div className="snippet-detail-spacer" /> {/* Spacer for centering */}
       </div>
 
       {error && (

@@ -1,11 +1,130 @@
 body {
-  margin: 10px;
+  margin: 0;
   display: flex;
   min-width: 320px;
   min-height: 100vh;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.app-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 16px;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.app-sidebar-brand {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.app-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-sidebar-footer {
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+  margin-top: 16px;
+}
+
+.app-sidebar-user {
+  font-size: 0.85em;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  padding: 24px;
+}
+
+.snippet-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.snippet-detail-spacer {
+  width: 120px;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .app-sidebar {
+    width: 100%;
+    padding: 12px 16px;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    gap: 12px;
+  }
+
+  .app-sidebar-brand {
+    margin-bottom: 8px;
+  }
+
+  .app-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+
+  .app-sidebar-footer {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .app-sidebar-user {
+    margin-bottom: 0;
+    min-width: 0;
+  }
+
+  .app-sidebar-footer button {
+    width: auto !important;
+    flex-shrink: 0;
+  }
+
+  .app-main {
+    padding: 16px 12px;
+  }
+
+  .snippet-detail-header {
+    flex-wrap: wrap;
+  }
+
+  .snippet-detail-spacer {
+    display: none;
+  }
 }
 
 .snippet-header {

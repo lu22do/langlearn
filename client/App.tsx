@@ -68,19 +68,10 @@ function AppContent() {
     const activeClass = ({ isActive }: { isActive: boolean }) =>
       "nav-link" + (isActive ? " active" : "");
     return (
-      <aside
-        style={{
-          width: 220,
-          padding: 16,
-          borderRight: "1px solid #eee",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
+      <aside className="app-sidebar">
         <div>
-          <div style={{ fontWeight: 700, marginBottom: 12 }}>LangLearn</div>
-          <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="app-sidebar-brand">LangLearn</div>
+          <nav className="app-nav">
             <NavLink to="/" className={activeClass} end>
               {t.nav.home}
             </NavLink>
@@ -99,8 +90,8 @@ function AppContent() {
           </nav>
         </div>
 
-        <div style={{ borderTop: "1px solid #eee", paddingTop: 12, marginTop: 16 }}>
-          <div style={{ fontSize: "0.85em", marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis" }}>
+        <div className="app-sidebar-footer">
+          <div className="app-sidebar-user">
             {user.displayName || user.email}
           </div>
           <button
@@ -118,9 +109,9 @@ function AppContent() {
   // Layout: sidebar + content area
   return (
     <BrowserRouter>
-      <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div className="app-shell">
         <Sidebar />
-        <main style={{ flex: 1, padding: 24 }}>
+        <main className="app-main">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/snippets" element={<SnippetList />} />

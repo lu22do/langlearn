@@ -100,12 +100,12 @@ export default function SnippetList() {
         ) : savedSnippets.length === 0 ? (
           <p style={{ color: "#6b7280" }}>{t.snippetList.noSnippets}</p>
         ) : (
-          <div style={{ overflowX: "auto", display: "flex", justifyContent: "center" }}>
-            <table style={{ width: "100%", minWidth: 1200, borderCollapse: "collapse", background: "#fff" }}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", background: "#fff" }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #e5e7eb", textAlign: "left" }}>
                   <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280" }}>{t.snippetList.snippet}</th>
-                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280", width: "90%" }}>{t.snippetCard.contextOrExample}</th>
+                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280" }}>{t.snippetCard.contextOrExample}</th>
                   <th style={{ padding: "12px 10px", width: 80 }}></th>
                 </tr>
               </thead>
@@ -127,7 +127,7 @@ export default function SnippetList() {
                       <td style={{ padding: "12px 10px", fontSize: 16, fontWeight: 600, color: "#111827" }}>
                         {snippet.rawText}
                       </td>
-                      <td style={{ padding: "12px 10px", fontSize: 15, color: "#4b5563", maxWidth: 480 }}>
+                      <td style={{ padding: "12px 10px", fontSize: 15, color: "#4b5563", maxWidth: "40vw" }}>
                         <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {previewText}
                         </div>
