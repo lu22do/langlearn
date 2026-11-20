@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import type { ISnippet } from "../../server/models/Snippet.js";
+import type { ISnippet, SnippetState } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
-import { apiFetch } from "../lib/api";
+import { apiFetch, updateSnippetState } from "../lib/api";
 import SnippetCard from "../components/SnippetCard";
+import StateSelector from "../components/StateSelector";
 
 type SnippetType = Omit<ISnippet, keyof Document> & { _id?: string };
 
@@ -66,6 +67,21 @@ export default function Snippet() {
     navigate("/snippets");
   };
 
+  const [updatingState, setUpdatingState] = useState(false);
+  const handleStateChange = async (newState: SnippetState) => {
+    if (!snippet?._id) return;
+    setUpdatingState(true);
+    setError(null);
+    try {
+      const updated = await updateSnippetState(snippet._id, newState);
+      setSnippet(updated);
+    } catch (err: any) {
+      setError(err?.message);
+    } finally {
+      setUpdatingState(false);
+    }
+  };
+
   if (loading) {
     return (
       <section>
@@ -111,6 +127,14 @@ export default function Snippet() {
       )}
 
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
+          <span style={{ fontSize: 14, color: "#6b7280" }}>{t.state.changeState}:</span>
+          <StateSelector
+            currentState={snippet.state || "new"}
+            onChange={handleStateChange}
+            disabled={updatingState}
+          />
+        </div>
         <SnippetCard 
           snippet={snippet} 
           onDelete={handleDelete}

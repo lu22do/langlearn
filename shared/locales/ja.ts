@@ -44,6 +44,7 @@ export const ja: TranslationKeys = {
   },
 
   snippetList: {
+    title: "スニペット",
     snippet: "スニペット",
     subtitle: "保存された言語スニペットを閲覧・管理します。カードをクリックして詳細を表示します。",
     savedSnippets: "保存されたスニペット",
@@ -121,5 +122,17 @@ export const ja: TranslationKeys = {
     title: "クイズ",
     subtitle: "インタラクティブなクイズで知識をテストします。",
     comingSoon: "近日公開...",
+  },
+
+  state: {
+    state: "状態",
+    changeState: "スニペットの状態",
+    new: "新規",
+    stillLearning: "学習中",
+    known: "習得済み",
+    knownArchived: "習得済み（アーカイブ）",
+    active: "新規＆学習中",
+    all: "すべて",
+    filterByState: "絞り込み",
   },
 };

@@ -44,6 +44,7 @@ export const fr: TranslationKeys = {
   },
 
   snippetList: {
+    title: "Extraits",
     snippet: "Extrait",
     subtitle: "Parcourez et gérez vos extraits de langue enregistrés. Cliquez sur une carte pour voir les détails.",
     savedSnippets: "Extraits enregistrés",
@@ -121,5 +122,17 @@ export const fr: TranslationKeys = {
     title: "Quiz",
     subtitle: "Testez vos connaissances avec des quiz interactifs.",
     comingSoon: "Bientôt disponible...",
+  },
+
+  state: {
+    state: "État",
+    changeState: "État de l'extrait",
+    new: "Nouveau",
+    stillLearning: "En cours",
+    known: "Acquis",
+    knownArchived: "Acquis (Archivé)",
+    active: "Nouveaux & En cours",
+    all: "Tous",
+    filterByState: "Filtrer",
   },
 };

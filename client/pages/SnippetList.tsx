@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import type { ISnippet } from "../../server/models/Snippet.js";
+import type { ISnippet, SnippetState } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
 import { apiFetch } from "../lib/api";
+import { StateBadge } from "../components/StateSelector";
 
 type Snippet = Omit<ISnippet, keyof Document> & { _id?: string };
+
+const ALL_STATES: SnippetState[] = ["new", "still learning", "known"];
 
 export default function SnippetList() {
   const { t } = useLocalization();
@@ -14,17 +17,48 @@ export default function SnippetList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedStates, setSelectedStates] = useState<SnippetState[]>(["new", "still learning"]);
 
-  // Fetch saved snippets on mount
+  const stateLabels: Record<SnippetState, string> = {
+    new: t.state.new,
+    "still learning": t.state.stillLearning,
+    known: t.state.knownArchived,
+  };
+
+  const toggleState = (state: SnippetState) => {
+    setSelectedStates((current) =>
+      current.includes(state) ? current.filter((s) => s !== state) : [...current, state]
+    );
+  };
+
+  // Close the filter dropdown when clicking outside of it
+  const filterRef = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
-    fetchSnippets();
+    const handleClickOutside = (event: MouseEvent) => {
+      const el = filterRef.current;
+      if (el && el.open && !el.contains(event.target as Node)) {
+        el.open = false;
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Fetch saved snippets on mount and when the filter changes
+  useEffect(() => {
+    fetchSnippets();
+  }, [selectedStates]);
+
   const fetchSnippets = async () => {
+    if (selectedStates.length === 0) {
+      setSavedSnippets([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch("/api/snippets");
+      const res = await apiFetch(`/api/snippets?state=${encodeURIComponent(selectedStates.join(","))}`);
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       setSavedSnippets(Array.isArray(data) ? data : []);
@@ -88,11 +122,38 @@ export default function SnippetList() {
 
       {/* Saved Snippets List */}
       <div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 12 }}>
           <h2 style={{ margin: 0 }}>{t.snippetList.savedSnippets} ({savedSnippets.length})</h2>
-          <button onClick={fetchSnippets} disabled={loading} style={{ padding: "8px 16px" }}>
-            {loading ? t.common.loading : t.common.refresh}
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 14, color: "#6b7280" }}>{t.state.filterByState}:</span>
+            <details ref={filterRef} className="dropdown" style={{ margin: 0, minWidth: 220 }}>
+              <summary style={{ fontSize: 14 }}>
+                {selectedStates.length === 0
+                  ? "—"
+                  : selectedStates.length === ALL_STATES.length
+                  ? t.state.all
+                  : ALL_STATES.filter((s) => selectedStates.includes(s)).map((s) => stateLabels[s]).join(", ")}
+              </summary>
+              <ul>
+                {ALL_STATES.map((state) => (
+                  <li key={state}>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, margin: 0, cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedStates.includes(state)}
+                        onChange={() => toggleState(state)}
+                        style={{ margin: 0 }}
+                      />
+                      {stateLabels[state]}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </details>
+            <button onClick={fetchSnippets} disabled={loading} style={{ padding: "8px 16px", margin: 0 }}>
+              {loading ? t.common.loading : t.common.refresh}
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -105,6 +166,7 @@ export default function SnippetList() {
               <thead>
                 <tr style={{ borderBottom: "1px solid #e5e7eb", textAlign: "left" }}>
                   <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280" }}>{t.snippetList.snippet}</th>
+                  <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280" }}>{t.state.state}</th>
                   <th style={{ padding: "12px 10px", fontSize: 13, color: "#6b7280" }}>{t.snippetCard.contextOrExample}</th>
                   <th style={{ padding: "12px 10px", width: 80 }}></th>
                 </tr>
@@ -126,6 +188,9 @@ export default function SnippetList() {
                     >
                       <td style={{ padding: "12px 10px", fontSize: 16, fontWeight: 600, color: "#111827" }}>
                         {snippet.rawText}
+                      </td>
+                      <td style={{ padding: "12px 10px" }}>
+                        <StateBadge state={snippet.state || "new"} compact />
                       </td>
                       <td style={{ padding: "12px 10px", fontSize: 15, color: "#4b5563", maxWidth: "40vw" }}>
                         <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>

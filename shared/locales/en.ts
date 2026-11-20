@@ -46,6 +46,7 @@ export const en = {
 
   // Snippet List page
   snippetList: {
+    title: "Snippets",
     snippet: "Snippet",
     subtitle: "Browse and manage your saved language snippets. Click on a card to view details.",
     savedSnippets: "Saved Snippets",
@@ -128,6 +129,19 @@ export const en = {
     title: "Quiz",
     subtitle: "Test your knowledge with interactive quizzes.",
     comingSoon: "Coming soon...",
+  },
+
+  // Snippet state
+  state: {
+    state: "State",
+    changeState: "Snippet state",
+    new: "New",
+    stillLearning: "Still learning",
+    known: "Known",
+    knownArchived: "Known (Archived)",
+    active: "New & Still learning",
+    all: "All",
+    filterByState: "Filter",
   },
 };
 

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import type { ISnippet } from "../../server/models/Snippet.js";
+import type { ISnippet, SnippetState } from "../../server/models/Snippet.js";
 import Example from "../components/Example";
+import StateSelector from "../components/StateSelector";
 import { useLocalization } from "../contexts/LocalizationContext";
-import { apiFetch } from "../lib/api";
+import { apiFetch, updateSnippetState } from "../lib/api";
 
 type SnippetType = Omit<ISnippet, keyof Document> & { _id?: string };
 type ReviewPhase = "empty" | "context" | "examples" | "translation";
@@ -57,7 +58,7 @@ export default function Review() {
       setError(null);
 
       try {
-        const response = await apiFetch("/api/snippets");
+        const response = await apiFetch("/api/snippets?state=new,still%20learning");
         if (!response.ok) {
           throw new Error("Failed to load snippets");
         }
@@ -110,6 +111,23 @@ export default function Review() {
   }, [loading, reviewQueue.length]);
 
   const currentSnippet = reviewQueue[activeIndex];
+  const [updatingState, setUpdatingState] = useState(false);
+
+  const handleStateChange = async (newState: SnippetState) => {
+    if (!currentSnippet?._id) return;
+    setUpdatingState(true);
+    setError(null);
+    try {
+      await updateSnippetState(currentSnippet._id, newState);
+      setReviewQueue((queue) =>
+        queue.map((s) => (s._id === currentSnippet._id ? { ...s, state: newState } : s))
+      );
+    } catch (err: any) {
+      setError(err?.message);
+    } finally {
+      setUpdatingState(false);
+    }
+  };
 
   const goToNextSnippet = () => {
     if (!reviewQueue.length) {
@@ -214,6 +232,14 @@ export default function Review() {
             <button onClick={() => setPhase("context")}>{t.learn.revealContext}</button>
             <button onClick={() => setPhase("examples")}>{t.learn.revealExamples}</button>
             <button onClick={() => setPhase("translation")}>{t.learn.revealTranslation}</button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 14, color: "#6b7280" }}>{t.state.changeState}:</span>
+            <StateSelector
+              currentState={currentSnippet.state || "new"}
+              onChange={handleStateChange}
+              disabled={updatingState}
+            />
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
             <button onClick={goToPreviousSnippet}>{t.learn.previousSnippet}</button>

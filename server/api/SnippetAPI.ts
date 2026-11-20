@@ -4,14 +4,35 @@ import { analyzeSnippet, generateQuiz } from "../ai.js";
 import { requireAuth } from "../middleware/auth.js";
 
 export function registerSnippetRoutes(app: Express) {
-  // Get all snippets with optional filtering by languageCode and tag
+  // Get all snippets with optional filtering by languageCode, tag and state
   app.get("/api/snippets", requireAuth, async (req, res) => {
     try {
-      const { languageCode, tag } = req.query;
+      const { languageCode, tag, state } = req.query;
       const filter: any = { userId: req.userId };
       if (languageCode) filter.languageCode = languageCode;
       if (tag) filter.tags = tag;
       
+      if (state) {
+        let states: string[] = [];
+        if (Array.isArray(state)) {
+          states = state.map(String);
+        } else if (typeof state === "string") {
+          states = state.split(",").map((s) => s.trim()).filter(Boolean);
+        }
+
+        if (states.length > 0 && !states.includes("all")) {
+          if (states.includes("new")) {
+            filter.$or = [
+              { state: { $in: states } },
+              { state: { $exists: false } },
+              { state: null },
+            ];
+          } else {
+            filter.state = { $in: states };
+          }
+        }
+      }
+
       const snippets = await Snippet.find(filter).sort({ createdAt: -1 });
       res.json(snippets);
     } catch (err) {
@@ -45,18 +66,45 @@ export function registerSnippetRoutes(app: Express) {
       const size = parseInt((req.query.size as string) || '5', 10);
       const ui_language = (req.query.ui_language as string) || 'en';
 
-      // sample random snippets for the authenticated user
-      const snippets = await Snippet.aggregate([
-        { $match: { userId: req.userId } },
+      // sample random snippets for the authenticated user (prioritize non-known snippets)
+      let snippets = await Snippet.aggregate([
+        { 
+          $match: { 
+            userId: req.userId,
+            $or: [
+              { state: { $ne: "known" } },
+              { state: { $exists: false } },
+              { state: null },
+            ]
+          } 
+        },
         { $sample: { size } },
-        { $project: { rawText: 1, languageCode: 1, sourceContext: 1, _id: 0 } }
+        { $project: { rawText: 1, languageCode: 1, sourceContext: 1, state: 1, _id: 1 } }
       ]);
+
+      if (!snippets || snippets.length === 0) {
+        snippets = await Snippet.aggregate([
+          { $match: { userId: req.userId } },
+          { $sample: { size } },
+          { $project: { rawText: 1, languageCode: 1, sourceContext: 1, state: 1, _id: 1 } }
+        ]);
+      }
 
       if (!snippets || snippets.length === 0) {
         return res.status(404).json({ message: 'No snippets available for quiz' });
       }
 
-      const quiz = await generateQuiz(snippets, ui_language, 'multiple_choice', 4);
+      const generatedQuestions = await generateQuiz(snippets, ui_language, 'multiple_choice', 4);
+      const snippetMap = new Map(snippets.map(s => [s.rawText.trim().toLowerCase(), s]));
+      const quiz = generatedQuestions.map((q, idx) => {
+        const matched = snippetMap.get(q.rawText.trim().toLowerCase()) || snippets[idx];
+        return {
+          ...q,
+          snippetId: matched?._id?.toString(),
+          snippetState: matched?.state || "new",
+        };
+      });
+
       res.json({ quiz });
     } catch (err: any) {
       console.error('Error generating quiz:', err);
@@ -79,6 +127,7 @@ export function registerSnippetRoutes(app: Express) {
       examples,
       explanations,
       translation,
+      state,
       difficulty,
       nextReview,
       reviewCount
@@ -104,6 +153,7 @@ export function registerSnippetRoutes(app: Express) {
       explanations,
       translation,
       userId: req.userId,
+      state: state || "new",
       difficulty,
       nextReview,
       reviewCount
@@ -146,6 +196,7 @@ export function registerSnippetRoutes(app: Express) {
       examples,
       explanations,
       translation,
+      state,
       difficulty,
       nextReview,
       reviewCount
@@ -161,6 +212,7 @@ export function registerSnippetRoutes(app: Express) {
     if (examples !== undefined) update.examples = examples;
     if (explanations !== undefined) update.explanations = explanations;
     if (translation !== undefined) update.translation = translation;
+    if (state !== undefined) update.state = state;
     if (difficulty !== undefined) update.difficulty = difficulty;
     if (nextReview !== undefined) update.nextReview = nextReview;
     if (reviewCount !== undefined) update.reviewCount = reviewCount;

@@ -15,6 +15,8 @@ export interface SnippetAnalysis {
   partOfSpeech?: string;                // the part of speech of the snippet (e.g. "verb", "noun")
 }
 
+export type SnippetState = "new" | "still learning" | "known";
+
 // Interface for raw snippet as entered by the user + accounting information
 export interface ISnippet extends Document, SnippetAnalysis {
   rawText: string;        // the snippet itself
@@ -23,6 +25,7 @@ export interface ISnippet extends Document, SnippetAnalysis {
   createdAt: Date;
   updatedAt: Date;
   userId?: string;
+  state: SnippetState;
   difficulty?: number;
   nextReview?: Date;
   reviewCount?: number;
@@ -35,6 +38,11 @@ const snippetSchema = new Schema<ISnippet>(
     languageCode: { type: String, required: true, default: "en" },
     sourceContext: { type: String, required: true, maxlength: 20000 },
     userId: { type: String },
+    state: {
+      type: String,
+      enum: ["new", "still learning", "known"],
+      default: "new",
+    },
     difficulty: { type: Number, min: 0, max: 1, default: 0.5 },
     nextReview: { type: Date },
     reviewCount: { type: Number, default: 0 },
@@ -55,6 +63,7 @@ const snippetSchema = new Schema<ISnippet>(
 );
 
 snippetSchema.index({ userId: 1, createdAt: -1 });
+snippetSchema.index({ userId: 1, state: 1 });
 snippetSchema.index({ languageCode: 1 });
 
 export default mongoose.model<ISnippet>("Snippet", snippetSchema);

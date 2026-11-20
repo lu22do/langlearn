@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import type { SnippetState } from "../../server/models/Snippet.js";
 import { useLocalization } from "../contexts/LocalizationContext";
-import { apiFetch } from "../lib/api";
+import { apiFetch, updateSnippetState } from "../lib/api";
+import StateSelector from "../components/StateSelector";
 
 type QuizQuestion = {
   rawText: string;
@@ -8,6 +10,8 @@ type QuizQuestion = {
   choices: string[];
   answerIndex: number;
   explanation?: string;
+  snippetId?: string;
+  snippetState?: SnippetState;
 };
 
 export default function Quiz() {
@@ -49,6 +53,21 @@ export default function Quiz() {
   const next = () => {
     setSelected(null);
     setIndex((i) => i + 1);
+  };
+
+  const [updatingState, setUpdatingState] = useState(false);
+  const handleStateChange = async (newState: SnippetState) => {
+    const q = quiz[index];
+    if (!q?.snippetId) return;
+    setUpdatingState(true);
+    try {
+      await updateSnippetState(q.snippetId, newState);
+      setQuiz((qs) => qs.map((item) => (item.snippetId === q.snippetId ? { ...item, snippetState: newState } : item)));
+    } catch (err: any) {
+      console.error("Failed to update snippet state:", err);
+    } finally {
+      setUpdatingState(false);
+    }
   };
 
   if (loading) return <section><h1>{t.quiz.title}</h1><p>{t.common.loading}</p></section>;
@@ -113,6 +132,17 @@ export default function Quiz() {
               {selected === cur.answerIndex ? 'Correct' : `Incorrect — Correct answer: ${cur.choices[cur.answerIndex]}`}
             </div>
             {cur.explanation && <div style={{ color: '#374151' }}>{cur.explanation}</div>}
+            {cur.snippetId && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 14, color: '#6b7280' }}>{t.state.changeState}:</span>
+                <StateSelector
+                  currentState={cur.snippetState || "new"}
+                  onChange={handleStateChange}
+                  disabled={updatingState}
+                  compact
+                />
+              </div>
+            )}
             <div style={{ marginTop: 12 }}>
               <button onClick={next} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #e5e7eb' }}>Next</button>
             </div>

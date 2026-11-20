@@ -44,6 +44,7 @@ export const de: TranslationKeys = {
   },
 
   snippetList: {
+    title: "Schnipsel",
     snippet: "Schnipsel",
     subtitle: "Durchsuchen und verwalten Sie Ihre gespeicherten Sprachschnipsel. Klicken Sie auf eine Karte, um Details anzuzeigen.",
     savedSnippets: "Gespeicherte Schnipsel",
@@ -121,5 +122,17 @@ export const de: TranslationKeys = {
     title: "Quiz",
     subtitle: "Testen Sie Ihr Wissen mit interaktiven Quiz.",
     comingSoon: "Kommt bald...",
+  },
+
+  state: {
+    state: "Status",
+    changeState: "Schnipsel-Status",
+    new: "Neu",
+    stillLearning: "Wird gelernt",
+    known: "Gelernt",
+    knownArchived: "Gelernt (Archiviert)",
+    active: "Neu & Wird gelernt",
+    all: "Alle",
+    filterByState: "Filter",
   },
 };
