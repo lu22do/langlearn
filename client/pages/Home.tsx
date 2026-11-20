@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import type { SnippetAnalysis, ISnippet } from "../../server/models/Snippet.js";
 import { useSettings } from "../contexts/SettingsContext";
 import { useLocalization } from "../contexts/LocalizationContext";
@@ -28,22 +28,45 @@ export default function Home() {
     const text = e.target.value;
     if (text.length <= MAX_CHARS) {
       setPrompt(text);
+      setSelection(null);
       setError(null);
     }
   };
 
-  const handleTextSelect = () => {
+  const handleTextSelect = useCallback(() => {
     const textarea = textAreaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
 
-    if (start !== end) {
+    if (typeof start === "number" && typeof end === "number" && start !== end) {
       setSelection({ start, end });
       setError(null);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      const textarea = textAreaRef.current;
+      if (!textarea) return;
+
+      if (document.activeElement === textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+
+        if (typeof start === "number" && typeof end === "number" && start !== end) {
+          setSelection({ start, end });
+          setError(null);
+        }
+      }
+    };
+
+    document.addEventListener("selectionchange", handleSelectionChange);
+    return () => {
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
+  }, []);
 
   const createSnippet = async () => {
     if (!selection || !prompt) {
@@ -142,8 +165,13 @@ export default function Home() {
           ref={textAreaRef}
           value={prompt}
           onChange={handleTextChange}
+          onSelect={handleTextSelect}
           onMouseUp={handleTextSelect}
           onKeyUp={handleTextSelect}
+          onTouchEnd={() => {
+            handleTextSelect();
+            setTimeout(handleTextSelect, 150);
+          }}
           placeholder={t.home.placeholder}
           style={{
             width: "100%",
@@ -164,12 +192,27 @@ export default function Home() {
       </div>
 
       {selection && selectedText && (
-        <div style={{ marginBottom: 24, padding: 12, background: "#f0f9ff", borderRadius: 6, border: "1px solid #bfdbfe" }}>
-          <strong>{t.home.selected}:</strong> "{selectedText}"
+        <div
+          style={{
+            marginBottom: 24,
+            padding: 12,
+            background: "#f0f9ff",
+            borderRadius: 6,
+            border: "1px solid #bfdbfe",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+          }}
+        >
+          <div style={{ wordBreak: "break-word", flex: 1, minWidth: 180 }}>
+            <strong>{t.home.selected}:</strong> &ldquo;{selectedText}&rdquo;
+          </div>
           <button
             onClick={createSnippet}
             disabled={analyzing}
-            style={{ marginLeft: 12, padding: "6px 12px", fontSize: 13 }}
+            style={{ padding: "8px 16px", fontSize: 14, margin: 0 }}
           >
             {analyzing ? t.home.analyzing : t.home.createSnippet}
           </button>
