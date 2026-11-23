@@ -5,14 +5,15 @@ import { useLocalization } from "../contexts/LocalizationContext";
 import { apiFetch } from "../lib/api";
 import SnippetCard from "../components/SnippetCard";
 
-type Snippet = Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & { _id?: string }; 
+type Snippet = Pick<ISnippet, 'rawText' | 'languageCode' | 'sourceContext'> & { _id?: string };
 
-interface PendingSnippetWithAnalysis extends Snippet, SnippetAnalysis {}
+interface PendingSnippetWithAnalysis extends Snippet, SnippetAnalysis { }
 
 export default function Home() {
   const { t } = useLocalization();
   const [prompt, setPrompt] = useState("");
   const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
+  const [editedText, setEditedText] = useState("");
   const [pendingSnippet, setPendingSnippet] = useState<PendingSnippetWithAnalysis | null>(null);
   const [saving, setSaving] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -74,8 +75,8 @@ export default function Home() {
       return;
     }
 
-    const rawText = prompt.substring(selection.start, selection.end).trim();
-    
+    const rawText = editedText.trim();
+
     if (!rawText) {
       setError(t.home.selectedTextEmpty);
       return;
@@ -103,7 +104,7 @@ export default function Home() {
       }
 
       const data = await res.json();
-      
+
       const newSnippet: PendingSnippetWithAnalysis = {
         rawText,
         languageCode: settings.learningLanguageCode,
@@ -142,7 +143,7 @@ export default function Home() {
       const saved = await res.json();
       setSuccess(`${t.home.snippetSaved}: "${saved.rawText}"`);
       setTimeout(() => setSuccess(null), 3000);
-      
+
       setPendingSnippet(null);
     } catch (err: any) {
       setError(err?.message ?? t.home.failedToSave);
@@ -152,6 +153,11 @@ export default function Home() {
   };
 
   const selectedText = selection ? prompt.substring(selection.start, selection.end) : "";
+
+  // Pre-fill the editable snippet text whenever the selection changes
+  useEffect(() => {
+    setEditedText(selectedText.trim());
+  }, [selectedText]);
 
   return (
     <section>
@@ -206,12 +212,28 @@ export default function Home() {
             gap: 12,
           }}
         >
-          <div style={{ wordBreak: "break-word", flex: 1, minWidth: 180 }}>
-            <strong>{t.home.selected}:</strong> &ldquo;{selectedText}&rdquo;
+          <div style={{ flex: 1, minWidth: 180, display: "flex", alignItems: "center", gap: 8 }}>
+            <label htmlFor="snippet-text" style={{ margin: 0, fontWeight: 600, whiteSpace: "nowrap" }}>
+              {t.home.selected}:
+            </label>
+            <input
+              id="snippet-text"
+              type="text"
+              value={editedText}
+              maxLength={500}
+              onChange={(e) => setEditedText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !analyzing && editedText.trim()) {
+                  e.preventDefault();
+                  createSnippet();
+                }
+              }}
+              style={{ margin: 0, padding: "6px 6px", fontSize: 14, flex: 1, minWidth: 0 }}
+            />
           </div>
           <button
             onClick={createSnippet}
-            disabled={analyzing}
+            disabled={analyzing || !editedText.trim()}
             style={{ padding: "8px 16px", fontSize: 14, margin: 0 }}
           >
             {analyzing ? t.home.analyzing : t.home.createSnippet}
@@ -247,13 +269,13 @@ export default function Home() {
               }}
             >
               <SnippetCard snippet={pendingSnippet} saving={saving} />
-              
+
               <div style={{ display: "flex", gap: 8, marginTop: 16, paddingTop: 16, borderTop: "1px solid #bfdbfe" }}>
                 <button
                   onClick={() => saveSnippet(pendingSnippet)}
                   disabled={saving}
-                  style={{ 
-                    padding: "8px 16px", 
+                  style={{
+                    padding: "8px 16px",
                     fontSize: 14,
                     fontWeight: 600,
                     background: "#2563eb",
@@ -268,11 +290,11 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setPendingSnippet(null)}
-                  style={{ 
-                    padding: "8px 16px", 
+                  style={{
+                    padding: "8px 16px",
                     fontSize: 14,
                     fontWeight: 600,
-                    background: "#f3f4f6", 
+                    background: "#f3f4f6",
                     color: "#374151",
                     border: "1px solid #d1d5db",
                     borderRadius: 6,
